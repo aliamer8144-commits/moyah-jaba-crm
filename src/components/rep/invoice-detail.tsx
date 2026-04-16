@@ -138,25 +138,6 @@ export function InvoiceDetail({
     toast.info('جارٍ تحضير الفاتورة للطباعة');
   };
 
-  const handleShare = async () => {
-    const text = `فاتورة مياه جبأ\nالعميل: ${invoice.client?.name || 'عميل'}\nالمبلغ: ${invoice.finalTotal.toLocaleString('ar-SA')} ر.س\nالتاريخ: ${formatDate(invoice.createdAt)}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: 'فاتورة مياه جبأ', text });
-      } catch {
-        // user cancelled
-      }
-    } else {
-      await navigator.clipboard.writeText(text);
-      toast.success('تم نسخ تفاصيل الفاتورة');
-    }
-  };
-
-  const handlePrint = () => {
-    window.print();
-    toast.info('جارٍ تحضير الفاتورة للطباعة');
-  };
-
   const handleOpenPaymentDialog = () => {
     setPaymentAmount(String(invoice.debtAmount));
     setPaymentMethod('نقدي');
