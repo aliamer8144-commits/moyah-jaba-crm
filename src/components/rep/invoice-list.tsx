@@ -345,21 +345,21 @@ export function InvoiceList() {
                 <Wallet className="w-3 h-3 text-[#007AFF]" />
               </div>
               <p className="text-[10px] text-gray-500 mb-0.5">الإجمالي</p>
-              <p className="text-sm font-bold text-[#1c1c1e] dark:text-white">{formatCurrency(totalFiltered)}</p>
+              <span className="inline-flex items-center justify-center gap-1 text-sm font-bold text-[#1c1c1e] dark:text-white">{formatCurrency(totalFiltered)} <SarIcon size={12} /></span>
             </div>
             <div className="text-center bg-gradient-to-b from-[#34C759]/5 to-transparent dark:from-[#34C759]/10 rounded-xl py-2.5 px-2">
               <div className="flex items-center justify-center gap-1 mb-1">
                 <TrendingUp className="w-3 h-3 text-[#34C759]" />
               </div>
               <p className="text-[10px] text-gray-500 mb-0.5">المدفوع</p>
-              <p className="text-sm font-bold text-[#34C759]">{formatCurrency(totalPaid)}</p>
+              <span className="inline-flex items-center justify-center gap-1 text-sm font-bold text-[#34C759]">{formatCurrency(totalPaid)} <SarIcon size={12} /></span>
             </div>
             <div className="text-center bg-gradient-to-b from-[#FF3B30]/5 to-transparent dark:from-[#FF3B30]/10 rounded-xl py-2.5 px-2">
               <div className="flex items-center justify-center gap-1 mb-1">
                 <TrendingDown className="w-3 h-3 text-[#FF3B30]" />
               </div>
               <p className="text-[10px] text-gray-500 mb-0.5">الديون</p>
-              <p className="text-sm font-bold debt-gradient-text">{formatCurrency(totalDebt)}</p>
+              <span className="inline-flex items-center justify-center gap-1 text-sm font-bold debt-gradient-text">{formatCurrency(totalDebt)} <SarIcon size={12} /></span>
             </div>
           </div>
         </motion.div>
