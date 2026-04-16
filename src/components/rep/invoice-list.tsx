@@ -492,7 +492,7 @@ export function InvoiceList() {
                     )}
                     {inv.debtAmount > 0 && (
                       <span className="inline-flex items-center gap-0.5 text-[10px] bg-[#FF3B30]/8 rounded-md px-1.5 py-0.5 font-bold debt-gradient-text">
-                        دين: {formatCurrency(inv.debtAmount)} <SarIcon size={9} />
+                        دين: {formatCurrency(inv.debtAmount)} <SarIcon size={9} className="text-[#FF3B30]" />
                       </span>
                     )}
                     {inv.creditAmount > 0 && (
