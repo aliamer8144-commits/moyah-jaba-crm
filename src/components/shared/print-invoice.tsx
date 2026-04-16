@@ -108,12 +108,14 @@ export function PrintInvoice({ invoice, repName }: PrintInvoiceProps) {
           </div>
         )}
 
-        <div className="print-inv-totals-row print-inv-final">
+        <div className="print-inv-totals-row">
           <span>الإجمالي النهائي</span>
           <span>{formatCurrency(invoice.finalTotal)} ر.س</span>
         </div>
 
-        <div className="print-inv-totals-row">
+        <div className="print-inv-divider" />
+
+        <div className="print-inv-totals-row print-inv-final">
           <span>المدفوع</span>
           <span>{formatCurrency(invoice.paidAmount)} ر.س</span>
         </div>
