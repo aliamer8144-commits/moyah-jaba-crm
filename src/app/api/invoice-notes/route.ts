@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { withRetry } from '@/lib/retry';
 
 // GET: Fetch all notes for an invoice
 export async function GET(request: NextRequest) {
@@ -59,12 +60,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'الفاتورة غير موجودة' }, { status: 404 });
     }
 
-    const note = await db.invoiceNote.create({
+    const note = await withRetry(() => db.invoiceNote.create({
       data: {
         invoiceId,
         content: content.trim(),
       },
-    });
+    }));
 
     return NextResponse.json(note, { status: 201 });
   } catch (error) {
@@ -95,9 +96,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'الملاحظة غير موجودة' }, { status: 404 });
     }
 
-    await db.invoiceNote.delete({
+    await withRetry(() => db.invoiceNote.delete({
       where: { id: noteId },
-    });
+    }));
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { withRetry } from "@/lib/retry";
 
 // GET /api/daily-goals?repId=xxx&date=YYYY-MM-DD
 export async function GET(request: NextRequest) {
@@ -108,19 +109,19 @@ export async function POST(request: NextRequest) {
 
     if (existingGoal) {
       // Update existing goal
-      const updated = await db.dailyGoal.update({
+      const updated = await withRetry(() => db.dailyGoal.update({
         where: { id: existingGoal.id },
         data: {
           targetRevenue: targetRevenue ?? 0,
           targetClients: targetClients ?? 0,
           targetVisits: targetVisits ?? 0,
         },
-      });
+      }));
       return NextResponse.json(updated);
     }
 
     // Create new goal
-    const goal = await db.dailyGoal.create({
+    const goal = await withRetry(() => db.dailyGoal.create({
       data: {
         repId,
         targetRevenue: targetRevenue ?? 0,
@@ -130,7 +131,7 @@ export async function POST(request: NextRequest) {
         actualClients: 0,
         actualVisits: 0,
       },
-    });
+    }));
 
     return NextResponse.json(goal);
   } catch (error) {
@@ -149,14 +150,14 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "معرف الهدف مطلوب" }, { status: 400 });
     }
 
-    const updated = await db.dailyGoal.update({
+    const updated = await withRetry(() => db.dailyGoal.update({
       where: { id: goalId },
       data: {
         ...(actualRevenue !== undefined && { actualRevenue }),
         ...(actualClients !== undefined && { actualClients }),
         ...(actualVisits !== undefined && { actualVisits }),
       },
-    });
+    }));
 
     return NextResponse.json(updated);
   } catch (error) {

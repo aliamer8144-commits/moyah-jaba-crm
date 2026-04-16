@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { withRetry } from "@/lib/retry";
 
 // GET /api/visits?repId=xxx or ?adminId=xxx
 export async function GET(request: NextRequest) {
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const visit = await db.visitLog.create({
+    const visit = await withRetry(() => db.visitLog.create({
       data: {
         repId,
         clientId: clientId || null,
@@ -79,16 +80,16 @@ export async function POST(request: NextRequest) {
         notes: notes || null,
         status: status || "completed",
       },
-    });
+    }));
 
     // Log activity
-    await db.activityLog.create({
+    await withRetry(() => db.activityLog.create({
       data: {
         repId,
         action: "تسجيل زيارة",
         details: `زيارة ${clientName} - الحالة: ${status === "completed" ? "مكتمل" : status === "no_answer" ? "لا يوجد رد" : "مؤجل"}`,
       },
-    });
+    }));
 
     return NextResponse.json(visit);
   } catch (error) {
@@ -119,7 +120,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "غير مصرح بحذف هذه الزيارة" }, { status: 403 });
     }
 
-    await db.visitLog.delete({ where: { id: visitId } });
+    await withRetry(() => db.visitLog.delete({ where: { id: visitId } }));
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Delete visit error:", error);

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { withRetry } from "@/lib/retry";
 
 // POST /api/notifications/send
 // Admin sends notification to specific rep or broadcasts to all reps
@@ -52,14 +53,14 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "المستخدم المحدد ليس مندوباً" }, { status: 400 });
       }
 
-      const notification = await db.notification.create({
+      const notification = await withRetry(() => db.notification.create({
         data: {
           userId: rep.id,
           title: title.trim(),
           message: message.trim(),
           type: notificationType,
         },
-      });
+      }));
 
       return NextResponse.json({
         success: true,
@@ -78,14 +79,14 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "لا يوجد مناديب نشطين" }, { status: 404 });
       }
 
-      const notifications = await db.notification.createMany({
+      const notifications = await withRetry(() => db.notification.createMany({
         data: reps.map((rep) => ({
           userId: rep.id,
           title: title.trim(),
           message: message.trim(),
           type: notificationType,
         })),
-      });
+      }));
 
       return NextResponse.json({
         success: true,

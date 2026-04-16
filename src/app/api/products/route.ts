@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { withRetry } from "@/lib/retry";
 
 // GET /api/products?adminId=xxx
 export async function GET(request: NextRequest) {
@@ -44,14 +45,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "اسم المنتج والحجم والسعر مطلوبين" }, { status: 400 });
     }
 
-    const product = await db.product.create({
+    const product = await withRetry(() => db.product.create({
       data: {
         name,
         size,
         price: parseFloat(price),
         isActive: isActive !== undefined ? isActive : true,
       },
-    });
+    }));
 
     return NextResponse.json(product);
   } catch (error) {
@@ -86,10 +87,10 @@ export async function PUT(request: NextRequest) {
     if (price !== undefined) updateData.price = parseFloat(price);
     if (isActive !== undefined) updateData.isActive = isActive;
 
-    const product = await db.product.update({
+    const product = await withRetry(() => db.product.update({
       where: { id: productId },
       data: updateData,
-    });
+    }));
 
     return NextResponse.json(product);
   } catch (error) {
@@ -116,9 +117,9 @@ export async function DELETE(request: NextRequest) {
       }
     }
 
-    await db.product.delete({
+    await withRetry(() => db.product.delete({
       where: { id: productId },
-    });
+    }));
 
     return NextResponse.json({ success: true });
   } catch (error) {

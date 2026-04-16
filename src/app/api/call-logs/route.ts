@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { withRetry } from "@/lib/retry";
 
 // GET /api/call-logs?repId=xxx&clientId=xxx
 export async function GET(request: NextRequest) {
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
     // Get client name for logging
     const client = await db.client.findUnique({ where: { id: clientId } });
 
-    const callLog = await db.callLog.create({
+    const callLog = await withRetry(() => db.callLog.create({
       data: {
         repId,
         clientId,
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
         duration: duration ? parseInt(duration) : null,
         notes: notes || null,
       },
-    });
+    }));
 
     // Log activity
     const typeLabels: Record<string, string> = {
@@ -80,13 +81,13 @@ export async function POST(request: NextRequest) {
       note: "ملاحظة",
     };
 
-    await db.activityLog.create({
+    await withRetry(() => db.activityLog.create({
       data: {
         repId,
         action: `تسجيل ${typeLabels[type]}`,
         details: `تم تسجيل ${typeLabels[type]} مع العميل ${client?.name || "غير معروف"}${notes ? ` - ${notes}` : ""}`,
       },
-    });
+    }));
 
     return NextResponse.json(callLog);
   } catch (error) {

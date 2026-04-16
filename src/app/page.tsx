@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
 import { LoginPage } from '@/components/app/login-page';
@@ -9,14 +9,18 @@ import { AdminView } from '@/components/app/admin-view';
 import { SyncIndicator } from '@/components/shared/sync-indicator';
 import { Droplets } from 'lucide-react';
 
-export default function Home() {
-  const [mounted, setMounted] = useState(false);
-  const { currentView, setCurrentView, user, isAuthenticated, setIsOnline } = useAppStore();
+const emptySubscribe = () => () => {};
 
-  // Wait for client-side hydration before rendering
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+export default function Home() {
+  // useSyncExternalStore: returns false on server, true on client (after hydration)
+  // This avoids the lint warning about setState in useEffect
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,  // Client: always mounted
+    () => false, // Server: never mounted
+  );
+
+  const { currentView, setCurrentView, user, isAuthenticated, setIsOnline } = useAppStore();
 
   // Check persisted user on mount
   useEffect(() => {

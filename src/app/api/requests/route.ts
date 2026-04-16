@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { withRetry } from "@/lib/retry";
 
 // GET /api/requests?repId=xxx or ?adminId=xxx
 export async function GET(request: NextRequest) {
@@ -46,14 +47,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "جميع الحقول مطلوبة" }, { status: 400 });
     }
 
-    const req = await db.request.create({
+    const req = await withRetry(() => db.request.create({
       data: { repId, type, entityType, entityId, reason, status: "pending" },
-    });
+    }));
 
     // Notify admins
     const admins = await db.user.findMany({ where: { role: "ADMIN" } });
     for (const admin of admins) {
-      await db.notification.create({
+      await withRetry(() => db.notification.create({
         data: {
           userId: admin.id,
           title: `طلب ${type === "edit" ? "تعديل" : "حذف"}`,
@@ -61,17 +62,17 @@ export async function POST(request: NextRequest) {
           type: "warning",
           relatedId: req.id,
         },
-      });
+      }));
     }
 
     // Log activity
-    await db.activityLog.create({
+    await withRetry(() => db.activityLog.create({
       data: {
         repId,
         action: `طلب ${type === "edit" ? "تعديل" : "حذف"}`,
         details: `تم إرسال طلب ${type === "edit" ? "تعديل" : "حذف"} ${entityType === "client" ? "عميل" : "فاتورة"}`,
       },
-    });
+    }));
 
     return NextResponse.json(req);
   } catch (error) {
@@ -110,13 +111,13 @@ export async function PATCH(request: NextRequest) {
     // If approved and type is delete, execute the deletion
     if (status === "approved" && req.type === "delete") {
       if (req.entityType === "client") {
-        await db.client.delete({ where: { id: req.entityId } });
+        await withRetry(() => db.client.delete({ where: { id: req.entityId } }));
       } else if (req.entityType === "invoice") {
         const invoice = await db.invoice.findUnique({
           where: { id: req.entityId },
         });
         if (invoice) {
-          await db.$transaction(async (tx) => {
+          await withRetry(() => db.$transaction(async (tx) => {
             await tx.user.update({
               where: { id: invoice.repId },
               data: {
@@ -126,22 +127,22 @@ export async function PATCH(request: NextRequest) {
               },
             });
             await tx.invoice.delete({ where: { id: req.entityId } });
-          });
+          }));
         }
       }
     }
 
-    const updatedReq = await db.request.update({
+    const updatedReq = await withRetry(() => db.request.update({
       where: { id: requestId },
       data: {
         status,
         adminNote: adminNote || null,
       },
-    });
+    }));
 
     // Notify rep
     const statusText = status === "approved" ? "تمت الموافقة" : "تم الرفض";
-    await db.notification.create({
+    await withRetry(() => db.notification.create({
       data: {
         userId: req.repId,
         title: statusText,
@@ -149,16 +150,16 @@ export async function PATCH(request: NextRequest) {
         type: status === "approved" ? "success" : "error",
         relatedId: req.id,
       },
-    });
+    }));
 
     // Log activity
-    await db.activityLog.create({
+    await withRetry(() => db.activityLog.create({
       data: {
         repId: adminId,
         action: `${status === "approved" ? "موافقة" : "رفض"} طلب`,
         details: `تم ${status === "approved" ? "الموافقة" : "الرفض"} على طلب ${req.type === "edit" ? "تعديل" : "حذف"} ${req.entityType === "client" ? "عميل" : "فاتورة"} - ${adminNote || ""}`,
       },
-    });
+    }));
 
     return NextResponse.json(updatedReq);
   } catch (error) {

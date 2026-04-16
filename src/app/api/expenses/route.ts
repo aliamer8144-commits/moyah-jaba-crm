@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { withRetry } from "@/lib/retry";
 
 // GET /api/expenses?repId=xxx or ?adminId=xxx or ?repId=xxx&from=YYYY-MM-DD&to=YYYY-MM-DD
 export async function GET(request: NextRequest) {
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
     const expenseDate = date ? new Date(date) : new Date();
 
     // Create expense
-    const expense = await db.expense.create({
+    const expense = await withRetry(() => db.expense.create({
       data: {
         repId,
         category,
@@ -92,28 +93,28 @@ export async function POST(request: NextRequest) {
         description: description || null,
         date: expenseDate,
       },
-    });
+    }));
 
     // Log activity
-    await db.activityLog.create({
+    await withRetry(() => db.activityLog.create({
       data: {
         repId,
         action: "تسجيل مصروف",
         details: `مصروف ${categoryLabels[category]} - المبلغ: ${parsedAmount.toLocaleString("ar-SA")} ر.س${description ? ` - ${description}` : ""}`,
       },
-    });
+    }));
 
     // Create notification for admin
     const admins = await db.user.findMany({ where: { role: "ADMIN" } });
     for (const admin of admins) {
-      await db.notification.create({
+      await withRetry(() => db.notification.create({
         data: {
           userId: admin.id,
           title: "مصروف جديد",
           message: `تم تسجيل مصروف ${categoryLabels[category]} بمبلغ ${parsedAmount.toLocaleString("ar-SA")} ر.س بواسطة ${rep.name}${description ? ` - ${description}` : ""}`,
           type: "info",
         },
-      });
+      }));
     }
 
     return NextResponse.json(expense);
@@ -144,16 +145,16 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "غير مصرح بحذف هذا المصروف" }, { status: 403 });
     }
 
-    await db.expense.delete({ where: { id: expenseId } });
+    await withRetry(() => db.expense.delete({ where: { id: expenseId } }));
 
     // Log activity
-    await db.activityLog.create({
+    await withRetry(() => db.activityLog.create({
       data: {
         repId: expense.repId,
         action: "حذف مصروف",
         details: `تم حذف مصروف بمبلغ ${expense.amount.toLocaleString("ar-SA")} ر.س`,
       },
-    });
+    }));
 
     return NextResponse.json({ success: true });
   } catch (error) {

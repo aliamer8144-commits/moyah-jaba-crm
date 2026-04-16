@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { withRetry } from "@/lib/retry";
 
 // GET /api/invoices?repId=xxx or ?adminId=xxx
 export async function GET(request: NextRequest) {
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create invoice and update inventory in transaction
-    const result = await db.$transaction(async (tx) => {
+    const result = await withRetry(() => db.$transaction(async (tx) => {
       const invoice = await tx.invoice.create({
         data: {
           repId,
@@ -139,31 +140,31 @@ export async function POST(request: NextRequest) {
       }
 
       return invoice;
-    });
+    }));
 
     // Get client name for logging
     const client = await db.client.findUnique({ where: { id: clientId } });
 
     // Log activity
-    await db.activityLog.create({
+    await withRetry(() => db.activityLog.create({
       data: {
         repId,
         action: "إنشاء فاتورة",
         details: `فاتورة جديدة للعميل ${client?.name || "غير معروف"} - المبلغ: ${finalTotal} ر.س`,
       },
-    });
+    }));
 
     // Create notification for admin
     const admins = await db.user.findMany({ where: { role: "ADMIN" } });
     for (const admin of admins) {
-      await db.notification.create({
+      await withRetry(() => db.notification.create({
         data: {
           userId: admin.id,
           title: "فاتورة جديدة",
           message: `تم إنشاء فاتورة بمبلغ ${finalTotal} ر.س للعميل ${client?.name || "غير معروف"}`,
           type: "success",
         },
-      });
+      }));
     }
 
     return NextResponse.json(result);
@@ -195,7 +196,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Restore inventory
-    await db.$transaction(async (tx) => {
+    await withRetry(() => db.$transaction(async (tx) => {
       await tx.user.update({
         where: { id: invoice.repId },
         data: { allocatedInventory: { increment: invoice.quantity + invoice.promotionQty } },
@@ -216,7 +217,7 @@ export async function DELETE(request: NextRequest) {
       }
 
       await tx.invoice.delete({ where: { id: invoiceId } });
-    });
+    }));
 
     return NextResponse.json({ success: true });
   } catch (error) {

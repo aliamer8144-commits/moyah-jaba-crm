@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { withRetry } from "@/lib/retry";
 
 // GET /api/settings
 export async function GET() {
@@ -32,11 +33,11 @@ export async function PUT(request: NextRequest) {
     }
 
     for (const [key, value] of Object.entries(settings)) {
-      await db.appSettings.upsert({
+      await withRetry(() => db.appSettings.upsert({
         where: { key },
         update: { value: String(value) },
         create: { key, value: String(value) },
-      });
+      }));
     }
 
     return NextResponse.json({ success: true });

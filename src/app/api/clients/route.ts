@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { withRetry } from "@/lib/retry";
 
 // GET /api/clients?repId=xxx
 export async function GET(request: NextRequest) {
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "اسم العميل مطلوب" }, { status: 400 });
     }
 
-    const client = await db.client.create({
+    const client = await withRetry(() => db.client.create({
       data: {
         repId,
         name,
@@ -69,28 +70,28 @@ export async function POST(request: NextRequest) {
         category: category || null,
         notes: notes || null,
       },
-    });
+    }));
 
     // Log activity
-    await db.activityLog.create({
+    await withRetry(() => db.activityLog.create({
       data: {
         repId,
         action: "إنشاء عميل",
         details: `تم إنشاء عميل جديد: ${name}`,
       },
-    });
+    }));
 
     // Create notification for admin
     const admins = await db.user.findMany({ where: { role: "ADMIN" } });
     for (const admin of admins) {
-      await db.notification.create({
+      await withRetry(() => db.notification.create({
         data: {
           userId: admin.id,
           title: "عميل جديد",
           message: `تم إنشاء عميل "${name}" بواسطة المندوب`,
           type: "info",
         },
-      });
+      }));
     }
 
     return NextResponse.json(client);
@@ -119,10 +120,10 @@ export async function PUT(request: NextRequest) {
     if (body.address !== undefined) updateData.address = body.address;
     if (body.category !== undefined) updateData.category = body.category;
 
-    const client = await db.client.update({
+    const client = await withRetry(() => db.client.update({
       where: { id: clientId },
       data: updateData,
-    });
+    }));
 
     return NextResponse.json(client);
   } catch (error) {
@@ -149,10 +150,10 @@ export async function PATCH(request: NextRequest) {
     if (category !== undefined) updateData.category = category;
     if (notes !== undefined) updateData.notes = notes;
 
-    const client = await db.client.update({
+    const client = await withRetry(() => db.client.update({
       where: { id: clientId },
       data: updateData,
-    });
+    }));
 
     return NextResponse.json(client);
   } catch (error) {
@@ -171,7 +172,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "معرف العميل مطلوب" }, { status: 400 });
     }
 
-    await db.client.delete({ where: { id: clientId } });
+    await withRetry(() => db.client.delete({ where: { id: clientId } }));
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Delete client error:", error);

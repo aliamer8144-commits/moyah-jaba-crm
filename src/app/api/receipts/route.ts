@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { withRetry } from "@/lib/retry";
 
 // GET /api/receipts?repId=xxx or ?adminId=xxx or ?clientId=xxx
 export async function GET(request: NextRequest) {
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
     const paymentMethod = method || "نقدي";
 
     // Create receipt and update client wallet in transaction
-    const result = await db.$transaction(async (tx) => {
+    const result = await withRetry(() => db.$transaction(async (tx) => {
       const receipt = await tx.receipt.create({
         data: {
           repId,
@@ -100,28 +101,28 @@ export async function POST(request: NextRequest) {
       });
 
       return receipt;
-    });
+    }));
 
     // Log activity
-    await db.activityLog.create({
+    await withRetry(() => db.activityLog.create({
       data: {
         repId,
         action: "تسجيل سند قبض",
         details: `سند قبض رقم ${receiptNo} - المبلغ: ${parsedAmount.toLocaleString("ar-SA")} ر.س من العميل ${client.name}`,
       },
-    });
+    }));
 
     // Create notification for admin
     const admins = await db.user.findMany({ where: { role: "ADMIN" } });
     for (const admin of admins) {
-      await db.notification.create({
+      await withRetry(() => db.notification.create({
         data: {
           userId: admin.id,
           title: "سند قبض جديد",
           message: `تم تسجيل سند قبض بمبلغ ${parsedAmount.toLocaleString("ar-SA")} ر.س من العميل ${client.name} بواسطة ${rep.name}`,
           type: "success",
         },
-      });
+      }));
     }
 
     return NextResponse.json(result);

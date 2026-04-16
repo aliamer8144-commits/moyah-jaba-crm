@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { withRetry } from "@/lib/retry";
 
 // GET /api/notifications?userId=xxx
 // GET /api/notifications?adminId=xxx&all=true (admin view: all users' notifications)
@@ -51,10 +52,10 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "معرف الإشعار مطلوب" }, { status: 400 });
     }
 
-    await db.notification.update({
+    await withRetry(() => db.notification.update({
       where: { id: notificationId },
       data: { isRead: true },
-    });
+    }));
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -74,10 +75,10 @@ export async function PUT(request: NextRequest) {
 
     if (adminId && all) {
       // Admin: mark ALL notifications as read
-      await db.notification.updateMany({
+      await withRetry(() => db.notification.updateMany({
         where: { isRead: false },
         data: { isRead: true },
-      });
+      }));
       return NextResponse.json({ success: true });
     }
 
@@ -85,10 +86,10 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "معرف المستخدم مطلوب" }, { status: 400 });
     }
 
-    await db.notification.updateMany({
+    await withRetry(() => db.notification.updateMany({
       where: { userId, isRead: false },
       data: { isRead: true },
-    });
+    }));
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -106,12 +107,12 @@ export async function DELETE(request: NextRequest) {
     const userId = searchParams.get("userId");
 
     if (notificationId) {
-      await db.notification.delete({ where: { id: notificationId } });
+      await withRetry(() => db.notification.delete({ where: { id: notificationId } }));
       return NextResponse.json({ success: true });
     }
 
     if (userId) {
-      await db.notification.deleteMany({ where: { userId } });
+      await withRetry(() => db.notification.deleteMany({ where: { userId } }));
       return NextResponse.json({ success: true });
     }
 

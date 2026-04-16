@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -13,7 +14,7 @@ model User {
   username           String   @unique
   password           String
   role               String   @default("REP") // ADMIN or REP
-  phone              String?
+  phone              String?  @db.VarChar(20)
   allocatedInventory Int      @default(0)
   isActive           Boolean  @default(true)
   createdAt          DateTime @default(now())
@@ -29,26 +30,33 @@ model User {
   visitLogs      VisitLog[]
   dailyGoals     DailyGoal[]
   callLogs       CallLog[]
+
+  @@index([username])
+  @@index([role])
 }
 
 model Client {
-  id          String   @id @default(cuid())
-  repId       String
-  name        String
-  businessName String?
-  phone       String?
-  address     String?
-  category    String?
-  notes       String?
-  walletBalance Float  @default(0) // positive = credit, negative = debt
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(cuid())
+  repId         String
+  name          String
+  businessName  String?  @db.VarChar(200)
+  phone         String?  @db.VarChar(20)
+  address       String?  @db.VarChar(500)
+  category      String?  @db.VarChar(100)
+  notes         String?  @db.Text
+  walletBalance Float    @default(0) // positive = credit, negative = debt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  rep      User     @relation(fields: [repId], references: [id])
+  rep      User     @relation(fields: [repId], references: [id], onDelete: Cascade)
   invoices Invoice[]
   receipts Receipt[]
   visitLogs VisitLog[]
   callLogs CallLog[]
+
+  @@index([repId])
+  @@index([name])
+  @@index([phone])
 }
 
 model Invoice {
@@ -56,11 +64,11 @@ model Invoice {
   repId         String
   clientId      String
   productId     String?
-  productSize   String   @default("عادي") // عادي, صغير, كبير
+  productSize   String   @default("عادي") @db.VarChar(50) // عادي, صغير, كبير
   quantity      Int
   price         Float
   total         Float
-  discountType  String?  @default("none") // none, percentage, fixed
+  discountType  String?  @default("none") @db.VarChar(20) // none, percentage, fixed
   discountValue Float    @default(0)
   finalTotal    Float
   promotionQty  Int      @default(0)
@@ -71,95 +79,118 @@ model Invoice {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  rep     User     @relation(fields: [repId], references: [id])
-  client  Client   @relation(fields: [clientId], references: [id])
-  product Product? @relation(fields: [productId], references: [id])
+  rep     User     @relation(fields: [repId], references: [id], onDelete: Cascade)
+  client  Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
   notes   InvoiceNote[]
+
+  @@index([repId])
+  @@index([clientId])
+  @@index([createdAt])
 }
 
 model Request {
-  id          String   @id @default(cuid())
-  repId       String
-  type        String   // edit, delete
-  entityType  String   // client, invoice
-  entityId    String
-  reason      String
-  status      String   @default("pending") // pending, approved, rejected
-  adminNote   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String   @id @default(cuid())
+  repId      String
+  type       String   @db.VarChar(20) // edit, delete
+  entityType String   @db.VarChar(20) // client, invoice
+  entityId   String
+  reason     String   @db.Text
+  status     String   @default("pending") @db.VarChar(20) // pending, approved, rejected
+  adminNote  String?  @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  rep User @relation(fields: [repId], references: [id])
+  rep User @relation(fields: [repId], references: [id], onDelete: Cascade)
+
+  @@index([repId])
+  @@index([status])
 }
 
 model ActivityLog {
   id        String   @id @default(cuid())
   repId     String?
-  action    String
-  details   String?
+  action    String   @db.VarChar(100)
+  details   String?  @db.Text
   createdAt DateTime @default(now())
 
-  rep User? @relation(fields: [repId], references: [id])
+  rep User? @relation(fields: [repId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([repId])
 }
 
 model Notification {
   id        String   @id @default(cuid())
   userId    String
-  title     String
-  message   String
-  type      String   @default("info") // info, success, warning, error
+  title     String   @db.VarChar(200)
+  message   String   @db.Text
+  type      String   @default("info") @db.VarChar(20) // info, success, warning, error
   isRead    Boolean  @default(false)
   relatedId String?
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
 }
 
 model AppSettings {
-  id              String @id @default(cuid())
-  key             String @unique
-  value           String
-  updatedAt       DateTime @updatedAt
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
 }
 
 model Receipt {
-  id          String   @id @default(cuid())
-  repId       String
-  clientId    String
-  receiptNo   String   @unique
-  amount      Float
-  method      String   @default("نقدي")
-  notes       String?
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  repId      String
+  clientId   String
+  receiptNo  String   @unique
+  amount     Float
+  method     String   @default("نقدي") @db.VarChar(50)
+  notes      String?  @db.Text
+  createdAt  DateTime @default(now())
 
-  rep    User   @relation(fields: [repId], references: [id])
-  client Client @relation(fields: [clientId], references: [id])
+  rep    User   @relation(fields: [repId], references: [id], onDelete: Cascade)
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([repId])
+  @@index([clientId])
+  @@index([createdAt])
 }
 
 model Expense {
   id          String   @id @default(cuid())
   repId       String
-  category    String   // fuel, food, maintenance, phone, other
+  category    String   @db.VarChar(50) // fuel, food, maintenance, phone, other
   amount      Float
-  description String?
+  description String?  @db.Text
   date        DateTime @default(now())
   createdAt   DateTime @default(now())
 
-  rep User @relation(fields: [repId], references: [id])
+  rep User @relation(fields: [repId], references: [id], onDelete: Cascade)
+
+  @@index([repId])
+  @@index([date])
 }
 
 model VisitLog {
-  id          String   @id @default(cuid())
-  repId       String
-  clientId    String?
-  clientName  String
-  notes       String?
-  status      String   @default("completed") // completed, no_answer, rescheduled
-  date        DateTime @default(now())
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  repId      String
+  clientId   String?
+  clientName String   @db.VarChar(200)
+  notes      String?  @db.Text
+  status     String   @default("completed") @db.VarChar(20) // completed, no_answer, rescheduled
+  date       DateTime @default(now())
+  createdAt  DateTime @default(now())
 
-  rep    User    @relation(fields: [repId], references: [id])
-  client Client? @relation(fields: [clientId], references: [id])
+  rep    User    @relation(fields: [repId], references: [id], onDelete: Cascade)
+  client Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
+
+  @@index([repId])
+  @@index([date])
 }
 
 model DailyGoal {
@@ -174,13 +205,16 @@ model DailyGoal {
   date          DateTime @default(now())
   createdAt     DateTime @default(now())
 
-  rep User @relation(fields: [repId], references: [id])
+  rep User @relation(fields: [repId], references: [id], onDelete: Cascade)
+
+  @@index([repId])
+  @@index([date])
 }
 
 model Product {
   id        String   @id @default(cuid())
-  name      String
-  size      String
+  name      String   @db.VarChar(200)
+  size      String   @db.VarChar(50)
   price     Float
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -189,26 +223,29 @@ model Product {
 }
 
 model InvoiceNote {
-  id        String   @id @default(cuid())
-  invoiceId String
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  invoiceId  String
+  content    String   @db.Text
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  invoice    Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
 }
 
 model CallLog {
-  id          String   @id @default(cuid())
-  repId       String
-  clientId    String
-  type        String   // "call", "whatsapp", "visit", "note"
-  duration    Int?     // call duration in seconds
-  notes       String?
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  repId      String
+  clientId   String
+  type       String   @db.VarChar(20) // "call", "whatsapp", "visit", "note"
+  duration   Int?     // call duration in seconds
+  notes      String?  @db.Text
+  createdAt  DateTime @default(now())
 
-  rep     User   @relation(fields: [repId], references: [id])
-  client  Client @relation(fields: [clientId], references: [id])
+  rep    User   @relation(fields: [repId], references: [id], onDelete: Cascade)
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   @@index([repId])
   @@index([clientId])
+  @@index([createdAt])
 }

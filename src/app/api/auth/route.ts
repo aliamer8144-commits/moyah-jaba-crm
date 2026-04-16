@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { withRetry } from "@/lib/retry";
 import { comparePassword, hashPassword } from "@/lib/auth";
 
 // POST /api/auth/login
@@ -94,7 +95,7 @@ export async function PUT(request: NextRequest) {
 
     const hashedPassword = await hashPassword(password);
 
-    const user = await db.user.create({
+    const user = await withRetry(() => db.user.create({
       data: {
         name,
         username,
@@ -103,7 +104,7 @@ export async function PUT(request: NextRequest) {
         role: role || "REP",
         allocatedInventory: role === "ADMIN" ? 0 : 0,
       },
-    });
+    }));
 
     return NextResponse.json({
       id: user.id,
@@ -145,10 +146,10 @@ export async function PATCH(request: NextRequest) {
     if (isActive !== undefined) updateData.isActive = isActive;
     if (password) updateData.password = await hashPassword(password);
 
-    const user = await db.user.update({
+    const user = await withRetry(() => db.user.update({
       where: { id: userId },
       data: updateData,
-    });
+    }));
 
     return NextResponse.json({
       id: user.id,
@@ -237,7 +238,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    await db.user.delete({ where: { id: userId! } });
+    await withRetry(() => db.user.delete({ where: { id: userId! } }));
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Delete user error:", error);
