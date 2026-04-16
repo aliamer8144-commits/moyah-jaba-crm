@@ -486,18 +486,18 @@ export function InvoiceList() {
                 <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-800 pt-2.5">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     {inv.discountValue > 0 && (
-                      <span className="text-[10px] bg-[#AF52DE]/10 text-[#AF52DE] px-2 py-0.5 rounded-md font-medium">
-                        خصم: {inv.discountType === 'percentage' ? `${inv.discountValue}%` : formatCurrency(inv.discountValue)}
+                      <span className="inline-flex items-center gap-0.5 text-[10px] bg-[#AF52DE]/10 text-[#AF52DE] px-2 py-0.5 rounded-md font-medium">
+                        خصم: {inv.discountType === 'percentage' ? `${inv.discountValue}%` : <>{formatCurrency(inv.discountValue)} <SarIcon size={9} /></>}
                       </span>
                     )}
                     {inv.debtAmount > 0 && (
-                      <span className="text-[10px] bg-[#FF3B30]/8 rounded-md px-1.5 py-0.5 font-bold debt-gradient-text">
-                        دين: {formatCurrency(inv.debtAmount)}
+                      <span className="inline-flex items-center gap-0.5 text-[10px] bg-[#FF3B30]/8 rounded-md px-1.5 py-0.5 font-bold debt-gradient-text">
+                        دين: {formatCurrency(inv.debtAmount)} <SarIcon size={9} />
                       </span>
                     )}
                     {inv.creditAmount > 0 && (
-                      <span className="text-[10px] text-white bg-gradient-to-l from-[#34C759] to-[#4CD964] px-2 py-0.5 rounded-md font-medium shadow-sm shadow-[#34C759]/20">
-                        رصيد: +{formatCurrency(inv.creditAmount)}
+                      <span className="inline-flex items-center gap-0.5 text-[10px] text-white bg-gradient-to-l from-[#34C759] to-[#4CD964] px-2 py-0.5 rounded-md font-medium shadow-sm shadow-[#34C759]/20">
+                        رصيد: +{formatCurrency(inv.creditAmount)} <SarIcon size={9} />
                       </span>
                     )}
                     {inv.promotionQty > 0 && (
