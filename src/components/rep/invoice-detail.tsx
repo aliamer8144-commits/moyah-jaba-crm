@@ -23,13 +23,19 @@ import {
   TrendingUp,
   Pencil,
   Trash2,
-  Share2,
   Printer,
   Banknote,
   RefreshCw,
   Tag,
   User,
+  MoreVertical,
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const fadeUp = {
   initial: { opacity: 0, y: 15 },
@@ -95,23 +101,8 @@ export function InvoiceDetail({
     setRequestDialogOpen(true);
   };
 
-  const handleShare = async () => {
-    const text = `فاتورة مياه جبأ\nالعميل: ${invoice.client?.name || 'عميل'}\nالمبلغ: ${formatCurrency(invoice.finalTotal)} ر.س\nالتاريخ: ${formatDate(invoice.createdAt)}`;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: 'فاتورة مياه جبأ', text });
-      } catch {
-        // user cancelled
-      }
-    } else {
-      await navigator.clipboard.writeText(text);
-      toast.success('تم نسخ تفاصيل الفاتورة');
-    }
-  };
-
   const handlePrint = () => {
     window.print();
-    toast.info('جارٍ تحضير الفاتورة للطباعة');
   };
 
   const handleOpenPaymentDialog = () => {
@@ -170,12 +161,58 @@ export function InvoiceDetail({
   return (
     <motion.div initial="initial" animate="animate" variants={fadeUp} className="space-y-4">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 pt-2">
-        <button onClick={onBack} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-          <ArrowRight className="w-5 h-5 text-gray-900 dark:text-white" />
-        </button>
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white">تفاصيل الفاتورة</h2>
+      <div className="flex items-center justify-between px-4 pt-2">
+        <div className="flex items-center gap-3">
+          <button onClick={onBack} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <ArrowRight className="w-5 h-5 text-gray-900 dark:text-white" />
+          </button>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">تفاصيل الفاتورة</h2>
+        </div>
+        <div className="flex items-center gap-1">
+          <button onClick={handlePrint} className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+            <Printer className="w-4.5 h-4.5 text-gray-600 dark:text-gray-300" />
+          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                <MoreVertical className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44 rounded-xl">
+              <DropdownMenuItem onClick={handleEditRequest} className="gap-2.5 py-2.5 cursor-pointer rounded-lg">
+                <Pencil className="w-4 h-4 text-[#007AFF]" />
+                <span className="text-sm">طلب تعديل</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDeleteRequest} className="gap-2.5 py-2.5 cursor-pointer rounded-lg text-red-500 focus:text-red-500 focus:bg-red-50 dark:focus:bg-red-900/10">
+                <Trash2 className="w-4 h-4" />
+                <span className="text-sm">طلب حذف</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
+
+      {/* Record Payment Button - Small, before invoice */}
+      <AnimatePresence>
+        {invoice.debtAmount > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 5 }}
+            transition={{ duration: 0.3 }}
+            className="mx-4"
+          >
+            <Button
+              onClick={handleOpenPaymentDialog}
+              size="sm"
+              className="w-full h-9 rounded-xl font-semibold text-xs bg-gradient-to-l from-emerald-500 to-emerald-600 text-white shadow-sm shadow-emerald-500/20 hover:shadow-emerald-500/30"
+            >
+              <CreditCard className="w-3.5 h-3.5 ml-1.5" />
+              تسجيل دفعة ({formatCurrency(invoice.debtAmount)} ر.س)
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Invoice Document */}
       <motion.div
@@ -389,76 +426,8 @@ export function InvoiceDetail({
       {/* Invoice Notes */}
       <InvoiceNotes invoiceId={invoice.id} clientName={invoice.client?.name || 'عميل'} />
 
-      {/* Action Buttons */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.4 }}
-        className="mx-4 flex gap-3 pb-3"
-      >
-        <Button
-          variant="outline"
-          onClick={handleShare}
-          className="flex-1 h-11 rounded-2xl font-semibold text-sm border-[#007AFF] text-[#007AFF] hover:bg-[#007AFF]/5"
-        >
-          <Share2 className="w-4 h-4 ml-1.5" />
-          مشاركة
-        </Button>
-        <Button
-          variant="outline"
-          onClick={handlePrint}
-          className="flex-1 h-11 rounded-2xl font-semibold text-sm border-[#FF9500] text-[#FF9500] hover:bg-[#FF9500]/5"
-        >
-          <Printer className="w-4 h-4 ml-1.5" />
-          طباعة
-        </Button>
-      </motion.div>
-
-      {/* Record Payment Button */}
-      <AnimatePresence>
-        {invoice.debtAmount > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ delay: 0.55, duration: 0.4 }}
-            className="mx-4 pb-3"
-          >
-            <Button
-              onClick={handleOpenPaymentDialog}
-              className="w-full h-12 rounded-2xl font-bold text-sm bg-gradient-to-l from-[#34C759] to-[#30D158] text-white shadow-lg shadow-[#34C759]/25"
-            >
-              <CreditCard className="w-5 h-5 ml-2" />
-              تسجيل دفعة
-            </Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Edit/Delete Actions */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6, duration: 0.4 }}
-        className="mx-4 flex gap-3 pb-6"
-      >
-        <Button
-          variant="outline"
-          onClick={handleEditRequest}
-          className="flex-1 h-11 rounded-2xl font-semibold text-sm border-[#007AFF] text-[#007AFF] hover:bg-[#007AFF]/5"
-        >
-          <Pencil className="w-4 h-4 ml-1.5" />
-          طلب تعديل
-        </Button>
-        <Button
-          variant="outline"
-          onClick={handleDeleteRequest}
-          className="flex-1 h-11 rounded-2xl font-semibold text-sm border-[#FF3B30] text-[#FF3B30] hover:bg-[#FF3B30]/5"
-        >
-          <Trash2 className="w-4 h-4 ml-1.5" />
-          طلب حذف
-        </Button>
-      </motion.div>
+      {/* Bottom spacer */}
+      <div className="pb-4" />
 
       {/* Payment Dialog */}
       <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
