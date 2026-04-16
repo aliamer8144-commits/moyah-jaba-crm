@@ -182,7 +182,7 @@ export function InvoiceDetail({
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
-        className="mx-4 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden"
+        className="screen-invoice mx-4 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden"
       >
         {/* Invoice Header - Brand */}
         <div className="bg-gradient-to-l from-[#007AFF] to-[#0055D4] px-5 py-4 text-white">
