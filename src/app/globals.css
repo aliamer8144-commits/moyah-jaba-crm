@@ -1491,7 +1491,7 @@ body, .bg-white, .bg-\[\#f2f2f7\], .text-\[\#1c1c1e\], .shadow-sm, .border-gray-
     padding: 0;
   }
 
-  .no-print, nav, header, .fixed, .sticky, button, .glass, footer, .screen-invoice {
+  .no-print, nav, header, .fixed, .sticky, button, .glass, footer, .screen-invoice, [data-sonner-toaster] {
     display: none !important;
   }
 
