@@ -194,19 +194,19 @@ export function LoginPage() {
         transition={{ duration: 0.5, ease: 'easeOut' }}
         className="w-full max-w-sm"
       >
-        {/* Logo */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="animate-float">
-            <div className="w-20 h-20 bg-gradient-to-br from-[#007AFF] to-[#5856D6] rounded-2xl flex items-center justify-center animate-logo-glow mb-4 shadow-lg shadow-[#007AFF]/20">
-              <Droplets className="w-10 h-10 text-white" />
-            </div>
-          </div>
-          <h1 className="text-2xl font-bold text-[#1c1c1e] dark:text-white">مياه جبأ</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">نظام إدارة المناديب</p>
-        </div>
-
         {/* Card */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm border border-gray-200/50 dark:border-gray-800/50">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-xl shadow-black/5 border border-gray-200/50 dark:border-gray-800/50">
+          {/* Logo & Name inside card */}
+          <div className="flex flex-col items-center mb-8">
+            <div className="animate-float">
+              <div className="w-20 h-20 bg-gradient-to-br from-[#007AFF] to-[#5856D6] rounded-2xl flex items-center justify-center animate-logo-glow mb-4 shadow-lg shadow-[#007AFF]/20">
+                <Droplets className="w-10 h-10 text-white" />
+              </div>
+            </div>
+            <h1 className="text-2xl font-bold text-[#1c1c1e] dark:text-white">مياه جبأ</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">نظام إدارة المناديب</p>
+          </div>
+
           <form onSubmit={handleLogin} className="space-y-5">
             {/* Username */}
             <div className="space-y-2">
