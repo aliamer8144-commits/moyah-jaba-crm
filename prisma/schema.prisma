@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String   @id @default(cuid())
+  name               String
+  username           String   @unique
+  password           String
+  role               String   @default("REP") // ADMIN or REP
+  phone              String?
+  allocatedInventory Int      @default(0)
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  clients        Client[]
+  invoices       Invoice[]
+  receipts       Receipt[]
+  requests       Request[]
+  notifications  Notification[]
+  activityLogs   ActivityLog[]
+  expenses       Expense[]
+  visitLogs      VisitLog[]
+  dailyGoals     DailyGoal[]
+  callLogs       CallLog[]
+}
+
+model Client {
+  id          String   @id @default(cuid())
+  repId       String
+  name        String
+  businessName String?
+  phone       String?
+  address     String?
+  category    String?
+  notes       String?
+  walletBalance Float  @default(0) // positive = credit, negative = debt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rep      User     @relation(fields: [repId], references: [id])
+  invoices Invoice[]
+  receipts Receipt[]
+  visitLogs VisitLog[]
+  callLogs CallLog[]
+}
+
+model Invoice {
+  id            String   @id @default(cuid())
+  repId         String
+  clientId      String
+  productId     String?
+  productSize   String   @default("عادي") // عادي, صغير, كبير
+  quantity      Int
+  price         Float
+  total         Float
+  discountType  String?  @default("none") // none, percentage, fixed
+  discountValue Float    @default(0)
+  finalTotal    Float
+  promotionQty  Int      @default(0)
+  paidAmount    Float
+  debtAmount    Float    @default(0)
+  creditAmount  Float    @default(0)
+  synced        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  rep     User     @relation(fields: [repId], references: [id])
+  client  Client   @relation(fields: [clientId], references: [id])
+  product Product? @relation(fields: [productId], references: [id])
+  notes   InvoiceNote[]
+}
+
+model Request {
+  id          String   @id @default(cuid())
+  repId       String
+  type        String   // edit, delete
+  entityType  String   // client, invoice
+  entityId    String
+  reason      String
+  status      String   @default("pending") // pending, approved, rejected
+  adminNote   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rep User @relation(fields: [repId], references: [id])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  repId     String?
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
+
+  rep User? @relation(fields: [repId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String   @default("info") // info, success, warning, error
+  isRead    Boolean  @default(false)
+  relatedId String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model AppSettings {
+  id              String @id @default(cuid())
+  key             String @unique
+  value           String
+  updatedAt       DateTime @updatedAt
+}
+
+model Receipt {
+  id          String   @id @default(cuid())
+  repId       String
+  clientId    String
+  receiptNo   String   @unique
+  amount      Float
+  method      String   @default("نقدي")
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  rep    User   @relation(fields: [repId], references: [id])
+  client Client @relation(fields: [clientId], references: [id])
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  repId       String
+  category    String   // fuel, food, maintenance, phone, other
+  amount      Float
+  description String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  rep User @relation(fields: [repId], references: [id])
+}
+
+model VisitLog {
+  id          String   @id @default(cuid())
+  repId       String
+  clientId    String?
+  clientName  String
+  notes       String?
+  status      String   @default("completed") // completed, no_answer, rescheduled
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  rep    User    @relation(fields: [repId], references: [id])
+  client Client? @relation(fields: [clientId], references: [id])
+}
+
+model DailyGoal {
+  id            String   @id @default(cuid())
+  repId         String
+  targetRevenue Float    @default(0)
+  targetClients Int      @default(0)
+  targetVisits  Int      @default(0)
+  actualRevenue Float    @default(0)
+  actualClients Int      @default(0)
+  actualVisits  Int      @default(0)
+  date          DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  rep User @relation(fields: [repId], references: [id])
+}
+
+model Product {
+  id        String   @id @default(cuid())
+  name      String
+  size      String
+  price     Float
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  invoices Invoice[]
+}
+
+model InvoiceNote {
+  id        String   @id @default(cuid())
+  invoiceId String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+model CallLog {
+  id          String   @id @default(cuid())
+  repId       String
+  clientId    String
+  type        String   // "call", "whatsapp", "visit", "note"
+  duration    Int?     // call duration in seconds
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  rep     User   @relation(fields: [repId], references: [id])
+  client  Client @relation(fields: [clientId], references: [id])
+
+  @@index([repId])
+  @@index([clientId])
+}
