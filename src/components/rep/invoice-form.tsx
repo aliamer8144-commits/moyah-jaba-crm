@@ -30,7 +30,6 @@ import {
   Gift,
   AlertCircle,
   CheckCircle2,
-  Truck,
 } from 'lucide-react';
 
 interface ProductItem {
@@ -142,6 +141,11 @@ export function InvoiceForm() {
   const selectedClient = useMemo(
     () => clients.find((c) => c.id === selectedClientId),
     [clients, selectedClientId]
+  );
+
+  const selectedProduct = useMemo(
+    () => products.find((p) => p.id === selectedProductId),
+    [products, selectedProductId]
   );
 
   const filteredClients = useMemo(
@@ -409,41 +413,57 @@ export function InvoiceForm() {
               </div>
             )}
 
-            {/* Qty & Price Row */}
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <div>
-                <label className="text-[11px] text-gray-500 mb-1 block">الكمية</label>
-                <Input
-                  ref={quantityRef}
-                  type="number"
-                  value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
-                  placeholder="0"
-                  min="0"
-                  className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 dark:text-white rounded-xl h-11 text-sm text-center font-semibold"
-                />
+            {/* Invoice Table */}
+            <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+              {/* Table Header */}
+              <div className="grid grid-cols-3 bg-gray-50 dark:bg-gray-800/80">
+                <div className="px-3 py-2.5 text-[11px] font-semibold text-gray-500 dark:text-gray-400 text-center border-l border-gray-200 dark:border-gray-700">المنتج</div>
+                <div className="px-3 py-2.5 text-[11px] font-semibold text-gray-500 dark:text-gray-400 text-center border-l border-gray-200 dark:border-gray-700">الكمية</div>
+                <div className="px-3 py-2.5 text-[11px] font-semibold text-gray-500 dark:text-gray-400 text-center">السعر</div>
               </div>
-              <div>
-                <label className="text-[11px] text-gray-500 mb-1 block">سعر الوحدة (ر.س)</label>
-                <Input
-                  type="number"
-                  value={price}
-                  onChange={(e) => { setPrice(e.target.value); setSelectedProductId(null); }}
-                  placeholder="0"
-                  min="0"
-                  step="0.5"
-                  className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 dark:text-white rounded-xl h-11 text-sm text-center font-semibold"
-                />
+              {/* Table Data Row */}
+              <div className="grid grid-cols-3">
+                <div className="px-3 py-2.5 flex items-center justify-center gap-1.5 border-l border-gray-100 dark:border-gray-800">
+                  <Droplets className="w-3.5 h-3.5 text-[#007AFF] shrink-0" />
+                  <span className="text-sm font-medium text-gray-800 dark:text-white truncate">
+                    {selectedProduct?.name || 'منتج'}
+                  </span>
+                </div>
+                <div className="px-2 py-2 flex items-center border-l border-gray-100 dark:border-gray-800">
+                  <Input
+                    ref={quantityRef}
+                    type="number"
+                    value={quantity}
+                    onChange={(e) => setQuantity(e.target.value)}
+                    placeholder="0"
+                    min="0"
+                    className="bg-transparent border-none shadow-none focus-visible:ring-0 h-8 text-sm text-center font-semibold text-gray-800 dark:text-white p-0 placeholder:text-gray-300 dark:placeholder:text-gray-600"
+                  />
+                </div>
+                <div className="px-2 py-2 flex items-center">
+                  <Input
+                    type="number"
+                    value={price}
+                    onChange={(e) => { setPrice(e.target.value); setSelectedProductId(null); }}
+                    placeholder="0"
+                    min="0"
+                    step="0.5"
+                    className="bg-transparent border-none shadow-none focus-visible:ring-0 h-8 text-sm text-center font-semibold text-gray-800 dark:text-white p-0 placeholder:text-gray-300 dark:placeholder:text-gray-600"
+                  />
+                </div>
               </div>
+              {/* Total Row */}
+              {total > 0 && (
+                <div className="grid grid-cols-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/30">
+                  <div className="col-span-2 px-3 py-2.5 text-sm text-gray-600 dark:text-gray-400 flex items-center justify-end font-medium">
+                    المجموع
+                  </div>
+                  <div className="px-3 py-2.5 text-sm font-bold text-gray-900 dark:text-white text-center">
+                    {total.toLocaleString('ar-SA')} <span className="text-[11px] font-normal text-gray-400">ر.س</span>
+                  </div>
+                </div>
+              )}
             </div>
-
-            {/* Subtotal Row */}
-            {total > 0 && (
-              <div className="flex items-center justify-between py-2 px-1">
-                <span className="text-sm text-gray-500">المجموع</span>
-                <span className="text-sm font-semibold text-gray-800 dark:text-white">{total.toLocaleString('ar-SA')} ر.س</span>
-              </div>
-            )}
           </div>
 
           {/* Discount Section */}
@@ -548,9 +568,14 @@ export function InvoiceForm() {
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">الدفع</p>
               {finalTotal > 0 && (
-                <p className="text-sm font-extrabold text-gray-900 dark:text-white">
-                  {finalTotal.toLocaleString('ar-SA')} <span className="text-xs font-normal text-gray-400">ر.س</span>
-                </p>
+                <div className="flex items-center gap-2">
+                  {discountAmount > 0 && (
+                    <span className="text-[11px] text-red-500 line-through">{total.toLocaleString('ar-SA')} ر.س</span>
+                  )}
+                  <p className="text-sm font-extrabold text-gray-900 dark:text-white">
+                    {finalTotal.toLocaleString('ar-SA')} <span className="text-xs font-normal text-gray-400">ر.س</span>
+                  </p>
+                </div>
               )}
             </div>
             <div>
@@ -607,31 +632,6 @@ export function InvoiceForm() {
           </>
         )}
       </button>
-
-      {/* Floating Total Bar */}
-      {(qty > 0 || prc > 0) && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="fixed bottom-0 left-0 right-0 z-50 p-3 bg-gradient-to-t from-white via-white to-white/95 dark:from-gray-950 dark:via-gray-950 dark:to-gray-950/95 border-t border-gray-200/50 dark:border-gray-800/50"
-        >
-          <div className="max-w-md mx-auto flex items-center justify-between bg-white dark:bg-gray-800 rounded-2xl px-4 py-3 shadow-lg border border-gray-100 dark:border-gray-700">
-            <div>
-              <p className="text-[11px] text-gray-400">الإجمالي</p>
-              <p className="text-lg font-extrabold text-gray-900 dark:text-white">
-                {finalTotal.toLocaleString('ar-SA')} <span className="text-xs font-normal text-gray-400">ر.س</span>
-              </p>
-            </div>
-            <button
-              onClick={() => document.getElementById('invoice-submit-btn')?.click()}
-              className="px-5 py-2.5 bg-gradient-to-l from-[#007AFF] to-[#0055D4] text-white rounded-xl text-sm font-semibold shadow-md shadow-[#007AFF]/25 flex items-center gap-1.5"
-            >
-              <Truck className="w-4 h-4" />
-              إنشاء
-            </button>
-          </div>
-        </motion.div>
-      )}
 
       {/* Debt Confirmation Dialog */}
       <AlertDialog open={confirmDialog === 'debt'} onOpenChange={(o) => !o && setConfirmDialog(null)}>
