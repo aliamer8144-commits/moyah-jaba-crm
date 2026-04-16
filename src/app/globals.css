@@ -2509,6 +2509,7 @@ body, .bg-white, .bg-\[\#f2f2f7\], .text-\[\#1c1c1e\], .shadow-sm, .border-gray-
   body { background: white !important; }
 }
 .print-only { display: none; }
+.print-invoice { display: none; }
 
 /* --- 13. Enhanced Tooltip --- */
 .tooltip-rtl {
