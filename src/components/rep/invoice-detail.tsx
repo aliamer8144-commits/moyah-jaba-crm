@@ -27,7 +27,6 @@ import {
   Trash2,
   Share2,
   Printer,
-  Copy,
   Banknote,
   RefreshCw,
 } from 'lucide-react';
@@ -95,7 +94,6 @@ export function InvoiceDetail({
     setRequestActionType,
     setRequestEntityId,
     setRepTab,
-    setDuplicateInvoiceData,
     setSelectedClientId,
     setInvoices,
   } = useAppStore();
@@ -140,16 +138,23 @@ export function InvoiceDetail({
     toast.info('جارٍ تحضير الفاتورة للطباعة');
   };
 
-  const handleDuplicate = () => {
-    setDuplicateInvoiceData({
-      clientId: invoice.clientId,
-      productSize: invoice.productSize,
-      quantity: invoice.quantity,
-      price: invoice.price,
-    });
-    setSelectedClientId(invoice.clientId);
-    setRepTab('create-invoice');
-    toast.success('تم نسخ بيانات الفاتورة، يمكنك تعديلها قبل الحفظ');
+  const handleShare = async () => {
+    const text = `فاتورة مياه جبأ\nالعميل: ${invoice.client?.name || 'عميل'}\nالمبلغ: ${invoice.finalTotal.toLocaleString('ar-SA')} ر.س\nالتاريخ: ${formatDate(invoice.createdAt)}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'فاتورة مياه جبأ', text });
+      } catch {
+        // user cancelled
+      }
+    } else {
+      await navigator.clipboard.writeText(text);
+      toast.success('تم نسخ تفاصيل الفاتورة');
+    }
+  };
+
+  const handlePrint = () => {
+    window.print();
+    toast.info('جارٍ تحضير الفاتورة للطباعة');
   };
 
   const handleOpenPaymentDialog = () => {
@@ -411,14 +416,7 @@ export function InvoiceDetail({
           <Printer className="w-4 h-4 ml-1.5" />
           طباعة
         </Button>
-        <Button
-          variant="outline"
-          onClick={handleDuplicate}
-          className="flex-1 h-11 rounded-2xl font-semibold text-sm border-[#34C759] text-[#34C759] hover:bg-[#34C759]/5 ripple-container"
-        >
-          <Copy className="w-4 h-4 ml-1.5" />
-          نسخ الفاتورة
-        </Button>
+
       </motion.div>
 
       {/* Record Payment Button - only if debtAmount > 0 */}

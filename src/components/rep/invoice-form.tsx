@@ -19,10 +19,6 @@ import {
   Search,
   Plus,
   Loader2,
-  Percent,
-  Calculator,
-  Copy,
-  X,
   Droplets,
   FileText,
   ChevronDown,
@@ -53,8 +49,6 @@ export function InvoiceForm() {
     setRequestEntityType,
     setRequestActionType,
     setRequestEntityId,
-    duplicateInvoiceData,
-    setDuplicateInvoiceData,
   } = useAppStore();
 
   const [quantity, setQuantity] = useState('');
@@ -73,19 +67,6 @@ export function InvoiceForm() {
   const [showDiscount, setShowDiscount] = useState(false);
   const [showPromotion, setShowPromotion] = useState(false);
   const quantityRef = useRef<HTMLInputElement>(null);
-
-  // Load duplicate invoice data
-  useEffect(() => {
-    if (duplicateInvoiceData) {
-      setSelectedClientId(duplicateInvoiceData.clientId);
-      setQuantity(String(duplicateInvoiceData.quantity));
-      setPrice(String(duplicateInvoiceData.price));
-      setPromotionQty('');
-      setDiscountType('none');
-      setDiscountValue('');
-      setPaidAmount('');
-    }
-  }, [duplicateInvoiceData, setSelectedClientId]);
 
   // Fetch clients
   useEffect(() => {
@@ -216,7 +197,6 @@ export function InvoiceForm() {
       if (!res.ok) throw new Error(data.error || 'حدث خطأ');
 
       toast.success('تم إنشاء الفاتورة بنجاح ✨');
-      setDuplicateInvoiceData(null);
       setSelectedClientId(null);
       setQuantity('');
       setPrice('');
@@ -249,25 +229,6 @@ export function InvoiceForm() {
       {/* Header */}
       <div className="flex items-center justify-between px-1">
         <h2 className="text-lg font-bold text-gray-900 dark:text-white">فاتورة جديدة</h2>
-        {invoices.length > 0 && !duplicateInvoiceData && (
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              const last = invoices[invoices.length - 1];
-              if (last) {
-                setDuplicateInvoiceData({ clientId: last.clientId, productSize: last.productSize || 'عادي', quantity: last.quantity, price: last.price });
-                setSelectedClientId(last.clientId);
-                setQuantity(String(last.quantity));
-                setPrice(String(last.price));
-                toast.success('تم نسخ آخر فاتورة');
-              }
-            }}
-            className="flex items-center gap-1.5 text-xs text-[#007AFF] bg-[#007AFF]/8 px-3 py-1.5 rounded-lg font-medium"
-          >
-            <Copy className="w-3.5 h-3.5" />
-            نسخ آخر فاتورة
-          </motion.button>
-        )}
       </div>
 
       {/* Invoice Document */}

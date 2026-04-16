@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore, Invoice } from '@/lib/store';
-import { toast } from 'sonner';
 import {
   Search,
   FileText,
@@ -15,7 +14,6 @@ import {
   TrendingDown,
   TrendingUp,
   Wallet,
-  Copy,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -46,17 +44,19 @@ function formatCurrency(n: number) {
 function InvoiceSkeletonCard() {
   return (
     <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm shimmer-skeleton dark-card-border">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3 flex-1">
-          <Skeleton className="w-11 h-11 rounded-full shrink-0" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-24 rounded-lg" />
-            <Skeleton className="h-3 w-32 rounded-lg" />
-          </div>
-        </div>
-        <div className="flex flex-col items-end gap-1">
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-3 w-24 rounded-lg" />
           <Skeleton className="h-4 w-16 rounded-lg" />
-          <Skeleton className="h-3 w-8 rounded-lg" />
+        </div>
+        <Skeleton className="h-4 w-32 rounded-lg" />
+        <div className="flex items-center gap-2">
+          <Skeleton className="h-3 w-20 rounded-lg" />
+          <Skeleton className="h-3 w-12 rounded-lg" />
+        </div>
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-3 w-16 rounded-lg" />
+          <Skeleton className="h-5 w-20 rounded-lg" />
         </div>
       </div>
     </div>
@@ -64,7 +64,7 @@ function InvoiceSkeletonCard() {
 }
 
 export function InvoiceList() {
-  const { user, invoices, setInvoices, setRepTab, setDuplicateInvoiceData } = useAppStore();
+  const { user, invoices, setInvoices, setRepTab } = useAppStore();
   const [search, setSearch] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -73,6 +73,7 @@ export function InvoiceList() {
   const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'paid' | 'debt' | 'synced' | 'unsynced'>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
+  const [syncTooltip, setSyncTooltip] = useState<string | null>(null);
 
   const fetchInvoices = useCallback(async () => {
     if (!user) return;
@@ -93,6 +94,14 @@ export function InvoiceList() {
   useEffect(() => {
     fetchInvoices();
   }, [fetchInvoices]);
+
+  // Auto-hide sync tooltip
+  useEffect(() => {
+    if (syncTooltip) {
+      const timer = setTimeout(() => setSyncTooltip(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [syncTooltip]);
 
   const now = new Date();
 
@@ -176,6 +185,15 @@ export function InvoiceList() {
     { id: 'lowest' as const, label: 'الأقل سعراً' },
   ];
 
+  const handleSyncClick = (e: React.MouseEvent, inv: Invoice) => {
+    e.stopPropagation();
+    if (inv.synced) {
+      setSyncTooltip('تمت مزامنة هذه الفاتورة بنجاح ✓');
+    } else {
+      setSyncTooltip('سيتم مزامنة هذه الفاتورة تلقائياً عند الاتصال بالإنترنت');
+    }
+  };
+
   return (
     <motion.div variants={stagger} initial="initial" animate="animate" className="p-4 space-y-4">
       <motion.div variants={fadeUp}>
@@ -213,7 +231,21 @@ export function InvoiceList() {
         </div>
       </motion.div>
 
-      {/* Filter Panel with Active State Animations */}
+      {/* Sync Tooltip */}
+      <AnimatePresence>
+        {syncTooltip && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="bg-[#1c1c1e] dark:bg-gray-700 text-white text-xs font-medium px-4 py-2.5 rounded-xl text-center shadow-lg"
+          >
+            {syncTooltip}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Filter Panel */}
       <AnimatePresence>
         {showFilter && (
           <motion.div
@@ -234,7 +266,7 @@ export function InvoiceList() {
                       onClick={() => setDateFilter(f.id)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                         dateFilter === f.id
-                          ? 'bg-gradient-to-l from-[#007AFF] to-[#5856D6] text-white shadow-md shadow-[#007AFF]/20 animate-filter-bounce'
+                          ? 'bg-gradient-to-l from-[#007AFF] to-[#0055D4] text-white shadow-md shadow-[#007AFF]/20'
                           : 'bg-[#f2f2f7] dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                       }`}
                     >
@@ -255,7 +287,7 @@ export function InvoiceList() {
                       onClick={() => setStatusFilter(f.id)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                         statusFilter === f.id
-                          ? 'bg-gradient-to-l from-[#007AFF] to-[#5856D6] text-white shadow-md shadow-[#007AFF]/20 animate-filter-bounce'
+                          ? 'bg-gradient-to-l from-[#007AFF] to-[#0055D4] text-white shadow-md shadow-[#007AFF]/20'
                           : 'bg-[#f2f2f7] dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                       }`}
                     >
@@ -276,7 +308,7 @@ export function InvoiceList() {
                       onClick={() => setSortBy(f.id)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${
                         sortBy === f.id
-                          ? 'bg-gradient-to-l from-[#007AFF] to-[#5856D6] text-white shadow-md shadow-[#007AFF]/20 animate-filter-bounce'
+                          ? 'bg-gradient-to-l from-[#007AFF] to-[#0055D4] text-white shadow-md shadow-[#007AFF]/20'
                           : 'bg-[#f2f2f7] dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                       }`}
                     >
@@ -290,7 +322,7 @@ export function InvoiceList() {
               {hasActiveFilters && (
                 <button
                   onClick={() => { setDateFilter('all'); setStatusFilter('all'); setSortBy('newest'); }}
-                  className="text-xs text-[#007AFF] font-medium hover:text-[#5856D6] transition-colors"
+                  className="text-xs text-[#007AFF] font-medium hover:text-[#0055D4] transition-colors"
                 >
                   مسح الفلاتر
                 </button>
@@ -300,7 +332,7 @@ export function InvoiceList() {
         )}
       </AnimatePresence>
 
-      {/* Summary Bar with Better Visual Hierarchy */}
+      {/* Summary Bar */}
       {filtered.length > 0 && !loading && (
         <motion.div
           variants={fadeUp}
@@ -387,93 +419,79 @@ export function InvoiceList() {
                 onClick={() => setSelectedInvoice(inv)}
                 className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm cursor-pointer transition-shadow duration-200 hover:shadow-md card-hover-lift dark-card-border"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="relative w-11 h-11 rounded-full flex items-center justify-center shrink-0 bg-gradient-to-br from-[#007AFF] to-[#5856D6] shadow-sm shadow-[#007AFF]/15">
-                      <span className="text-white font-bold text-sm">
-                        {(inv.client?.name || 'ع').charAt(0)}
-                      </span>
-                      {inv.debtAmount > 0 && (
-                        <span className="absolute -top-0.5 -left-0.5 w-3 h-3 bg-[#FF3B30] rounded-full border-2 border-white dark:border-[#1c1c1e]" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-sm truncate text-[#1c1c1e] dark:text-white">
-                        {inv.client?.name || 'عميل'}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <div className="flex items-center gap-1 text-[11px] text-gray-400">
-                          <Clock className="w-3 h-3" />
-                          {formatDate(inv.createdAt)}
-                        </div>
-                        <span className="text-[11px] text-gray-300">|</span>
-                        <span className="text-[11px] text-gray-400">{inv.quantity} كرتون</span>
-                        {inv.productSize !== 'عادي' && (
-                          <span className="text-[10px] badge-gradient-orange px-1.5 py-0.5 rounded-md font-medium">
-                            {inv.productSize}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="text-left flex items-center gap-2">
-                    <div className="flex flex-col items-end">
-                      <p className="text-sm font-bold text-[#1c1c1e] dark:text-white">{formatCurrency(inv.finalTotal)}</p>
-                      {inv.debtAmount > 0 && (
-                        <span className="text-[10px] bg-[#FF3B30]/8 rounded-md px-1.5 py-0.5 font-bold debt-gradient-text badge-gradient-red">
-                          دين: {formatCurrency(inv.debtAmount)}
-                        </span>
-                      )}
-                      {inv.creditAmount > 0 && (
-                        <span className="text-[10px] text-white bg-gradient-to-l from-[#34C759] to-[#4CD964] px-2 py-0.5 rounded-md font-medium mt-0.5 shadow-sm shadow-[#34C759]/20 badge-gradient-green">
-                          رصيد: +{formatCurrency(inv.creditAmount)}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <motion.button
-                        whileTap={{ scale: 0.85 }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDuplicateInvoiceData({
-                            clientId: inv.clientId,
-                            productSize: inv.productSize,
-                            quantity: inv.quantity,
-                            price: inv.price,
-                          });
-                          setRepTab('create-invoice');
-                          toast.success('تم نسخ بيانات الفاتورة');
-                        }}
-                        className="p-1.5 rounded-lg hover:bg-[#007AFF]/10 transition-colors text-gray-400 hover:text-[#007AFF] touch-feedback"
-                        title="نسخ الفاتورة"
-                      >
-                        <Copy className="w-3.5 h-3.5" />
-                      </motion.button>
-                      {inv.synced ? (
-                        <CheckCircle className="w-4 h-4 text-[#34C759]" />
-                      ) : (
-                        <XCircle className="w-4 h-4 text-[#FF9500]" />
-                      )}
-                    </div>
-                  </div>
+                {/* Top Row: Date (left) + Sync (right) */}
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] text-gray-400 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {formatDate(inv.createdAt)}
+                  </span>
+                  <motion.button
+                    whileTap={{ scale: 0.85 }}
+                    onClick={(e) => handleSyncClick(e, inv)}
+                    className="touch-feedback"
+                    title={inv.synced ? 'تمت المزامنة' : 'بانتظار المزامنة'}
+                  >
+                    {inv.synced ? (
+                      <CheckCircle className="w-4.5 h-4.5 text-[#34C759]" />
+                    ) : (
+                      <XCircle className="w-4.5 h-4.5 text-[#FF3B30]" />
+                    )}
+                  </motion.button>
                 </div>
 
-                {/* Discount and Promotion badges */}
-                {(inv.discountValue > 0 || inv.promotionQty > 0) && (
-                  <div className="flex items-center gap-2 mt-2">
+                {/* Client Name Row: full width */}
+                <div className="flex items-center gap-2.5 mb-1.5">
+                  <div className="relative w-9 h-9 rounded-full flex items-center justify-center shrink-0 bg-gradient-to-br from-[#007AFF] to-[#0055D4] shadow-sm shadow-[#007AFF]/15">
+                    <span className="text-white font-bold text-xs">
+                      {(inv.client?.name || 'ع').charAt(0)}
+                    </span>
+                    {inv.debtAmount > 0 && (
+                      <span className="absolute -top-0.5 -left-0.5 w-2.5 h-2.5 bg-[#FF3B30] rounded-full border-2 border-white dark:border-[#1c1c1e]" />
+                    )}
+                  </div>
+                  <h3 className="font-semibold text-sm truncate text-[#1c1c1e] dark:text-white flex-1">
+                    {inv.client?.name || 'عميل'}
+                  </h3>
+                </div>
+
+                {/* Business Name + Quantity Row */}
+                <div className="flex items-center justify-between mb-3 mr-11">
+                  <span className="text-[11px] text-gray-400 truncate">
+                    {inv.client?.businessName || ''}
+                  </span>
+                  <span className="text-[11px] text-gray-500 font-medium shrink-0">
+                    {inv.quantity} كرتون
+                  </span>
+                </div>
+
+                {/* Bottom Row: Discount/Debt/Credit (right) + Final Total (left) */}
+                <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-800 pt-2.5">
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     {inv.discountValue > 0 && (
-                      <span className="text-[10px] bg-[#AF52DE]/10 text-[#AF52DE] px-2 py-0.5 rounded-md font-medium badge-gradient-purple">
+                      <span className="text-[10px] bg-[#AF52DE]/10 text-[#AF52DE] px-2 py-0.5 rounded-md font-medium">
                         خصم: {inv.discountType === 'percentage' ? `${inv.discountValue}%` : formatCurrency(inv.discountValue)}
                       </span>
                     )}
+                    {inv.debtAmount > 0 && (
+                      <span className="text-[10px] bg-[#FF3B30]/8 rounded-md px-1.5 py-0.5 font-bold debt-gradient-text">
+                        دين: {formatCurrency(inv.debtAmount)}
+                      </span>
+                    )}
+                    {inv.creditAmount > 0 && (
+                      <span className="text-[10px] text-white bg-gradient-to-l from-[#34C759] to-[#4CD964] px-2 py-0.5 rounded-md font-medium shadow-sm shadow-[#34C759]/20">
+                        رصيد: +{formatCurrency(inv.creditAmount)}
+                      </span>
+                    )}
                     {inv.promotionQty > 0 && (
-                      <span className="text-[10px] bg-[#FF9500]/10 text-[#FF9500] px-2 py-0.5 rounded-md font-medium badge-gradient-orange">
+                      <span className="text-[10px] bg-[#FF9500]/10 text-[#FF9500] px-2 py-0.5 rounded-md font-medium">
                         دعاية: {inv.promotionQty} كرتون
                       </span>
                     )}
                   </div>
-                )}
+                  <p className="text-base font-extrabold text-[#1c1c1e] dark:text-white shrink-0">
+                    {formatCurrency(inv.finalTotal)} <span className="text-[10px] font-normal text-gray-400">ر.س</span>
+                  </p>
+                </div>
               </motion.div>
             ))}
           </AnimatePresence>
