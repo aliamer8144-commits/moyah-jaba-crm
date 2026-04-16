@@ -73,7 +73,7 @@ export function InvoiceList() {
   const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'paid' | 'debt' | 'synced' | 'unsynced'>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
-  const [syncTooltip, setSyncTooltip] = useState<string | null>(null);
+  const [syncTooltip, setSyncTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
 
   const fetchInvoices = useCallback(async () => {
     if (!user) return;
@@ -102,6 +102,13 @@ export function InvoiceList() {
       return () => clearTimeout(timer);
     }
   }, [syncTooltip]);
+
+  // Hide tooltip on scroll
+  useEffect(() => {
+    const handleScroll = () => setSyncTooltip(null);
+    window.addEventListener('scroll', handleScroll, true);
+    return () => window.removeEventListener('scroll', handleScroll, true);
+  }, []);
 
   const now = new Date();
 
@@ -187,11 +194,11 @@ export function InvoiceList() {
 
   const handleSyncClick = (e: React.MouseEvent, inv: Invoice) => {
     e.stopPropagation();
-    if (inv.synced) {
-      setSyncTooltip('تمت مزامنة هذه الفاتورة بنجاح ✓');
-    } else {
-      setSyncTooltip('سيتم مزامنة هذه الفاتورة تلقائياً عند الاتصال بالإنترنت');
-    }
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const text = inv.synced
+      ? 'تمت مزامنة هذه الفاتورة بنجاح ✓'
+      : 'سيتم مزامنة هذه الفاتورة تلقائياً عند الاتصال بالإنترنت';
+    setSyncTooltip({ text, x: rect.left + rect.width / 2, y: rect.top });
   };
 
   return (
@@ -231,16 +238,24 @@ export function InvoiceList() {
         </div>
       </motion.div>
 
-      {/* Sync Tooltip */}
+      {/* Sync Tooltip - positioned near the clicked button */}
       <AnimatePresence>
         {syncTooltip && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="bg-[#1c1c1e] dark:bg-gray-700 text-white text-xs font-medium px-4 py-2.5 rounded-xl text-center shadow-lg"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="fixed z-[100] pointer-events-none"
+            style={{
+              left: syncTooltip.x,
+              top: syncTooltip.y - 8,
+              transform: 'translate(-50%, -100%)',
+            }}
           >
-            {syncTooltip}
+            <div className="bg-[#1c1c1e] dark:bg-gray-700 text-white text-xs font-medium px-3.5 py-2 rounded-xl shadow-lg whitespace-nowrap">
+              {syncTooltip.text}
+              <div className="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-3 bg-[#1c1c1e] dark:bg-gray-700 rotate-45 rounded-sm" />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -439,9 +454,9 @@ export function InvoiceList() {
                   </motion.button>
                 </div>
 
-                {/* Client Name Row: full width */}
-                <div className="flex items-center gap-2.5 mb-1.5">
-                  <div className="relative w-9 h-9 rounded-full flex items-center justify-center shrink-0 bg-gradient-to-br from-[#007AFF] to-[#0055D4] shadow-sm shadow-[#007AFF]/15">
+                {/* Client Info: Name aligned with avatar top, business name below */}
+                <div className="flex items-start gap-2.5 mb-3">
+                  <div className="relative w-9 h-9 rounded-full flex items-center justify-center shrink-0 bg-gradient-to-br from-[#007AFF] to-[#0055D4] shadow-sm shadow-[#007AFF]/15 mt-[-2px]">
                     <span className="text-white font-bold text-xs">
                       {(inv.client?.name || 'ع').charAt(0)}
                     </span>
@@ -449,19 +464,21 @@ export function InvoiceList() {
                       <span className="absolute -top-0.5 -left-0.5 w-2.5 h-2.5 bg-[#FF3B30] rounded-full border-2 border-white dark:border-[#1c1c1e]" />
                     )}
                   </div>
-                  <h3 className="font-semibold text-sm truncate text-[#1c1c1e] dark:text-white flex-1">
-                    {inv.client?.name || 'عميل'}
-                  </h3>
-                </div>
-
-                {/* Business Name + Quantity Row */}
-                <div className="flex items-center justify-between mb-3 mr-11">
-                  <span className="text-[11px] text-gray-400 truncate">
-                    {inv.client?.businessName || ''}
-                  </span>
-                  <span className="text-[11px] text-gray-500 font-medium shrink-0">
-                    {inv.quantity} كرتون
-                  </span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-sm text-[#1c1c1e] dark:text-white leading-tight">
+                      {inv.client?.name || 'عميل'}
+                    </h3>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      {inv.client?.businessName && (
+                        <span className="text-[11px] text-gray-400 truncate">
+                          {inv.client.businessName}
+                        </span>
+                      )}
+                      <span className="text-[11px] text-gray-500 font-medium shrink-0">
+                        {inv.quantity} كرتون
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Bottom Row: Discount/Debt/Credit (right) + Final Total (left) */}
