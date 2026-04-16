@@ -306,8 +306,7 @@ export function InvoiceDetail({
 
             <div className="space-y-2.5">
               <Row label="المنتج" value="مياه جبأ" icon={<Package className="w-4 h-4 text-gray-400" />} />
-              <Row label="حجم المنتج" value={invoice.productSize} />
-              <Row label="الكمية" value={`${invoice.quantity} كرتون`} />
+              <Row label="الكمية" value={`${invoice.quantity}`} />
               <Row label="سعر الوحدة" value={`${invoice.price.toLocaleString('ar-SA')} ر.س`} />
               <Row label="الإجمالي" value={`${invoice.total.toLocaleString('ar-SA')} ر.س`} bold />
 
@@ -323,7 +322,7 @@ export function InvoiceDetail({
               {invoice.promotionQty > 0 && (
                 <div className="flex items-center gap-2 text-xs text-[#FF9500] bg-[#FF9500]/5 px-3 py-2 rounded-lg">
                   <Gift className="w-3.5 h-3.5" />
-                  <span>دعاية: {invoice.promotionQty} كرتون مجاني</span>
+                  <span>دعاية: {invoice.promotionQty} مجانية</span>
                 </div>
               )}
             </div>
