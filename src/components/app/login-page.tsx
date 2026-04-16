@@ -9,6 +9,114 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { User, Lock, Eye, EyeOff, Droplets, Loader2 } from 'lucide-react';
 
+function WaterWaves() {
+  return (
+    <div className="absolute bottom-0 left-0 right-0 h-48 overflow-hidden pointer-events-none">
+      <svg
+        className="animate-water-wave absolute bottom-0 w-[200%] h-full"
+        viewBox="0 0 1440 200"
+        preserveAspectRatio="none"
+      >
+        <path
+          fill="rgba(0, 122, 255, 0.06)"
+          d="M0,100 C240,150 480,50 720,100 C960,150 1200,50 1440,100 L1440,200 L0,200 Z"
+        />
+      </svg>
+      <svg
+        className="animate-water-wave-2 absolute bottom-0 w-[200%] h-full"
+        viewBox="0 0 1440 200"
+        preserveAspectRatio="none"
+      >
+        <path
+          fill="rgba(0, 122, 255, 0.04)"
+          d="M0,120 C360,180 720,60 1080,120 C1260,150 1360,90 1440,120 L1440,200 L0,200 Z"
+        />
+      </svg>
+      <svg
+        className="animate-water-wave-3 absolute bottom-0 w-[200%] h-full"
+        viewBox="0 0 1440 200"
+        preserveAspectRatio="none"
+      >
+        <path
+          fill="rgba(0, 122, 255, 0.03)"
+          d="M0,140 C300,100 600,180 900,140 C1100,110 1300,170 1440,140 L1440,200 L0,200 Z"
+        />
+      </svg>
+    </div>
+  );
+}
+
+function FloatingBubbles() {
+  const bubbles = [
+    { size: 12, left: '10%', delay: '0s', duration: '8s' },
+    { size: 6, left: '22%', delay: '6.5s', duration: '12s' },
+    { size: 8, left: '35%', delay: '2s', duration: '10s' },
+    { size: 18, left: '48%', delay: '1s', duration: '7s' },
+    { size: 5, left: '60%', delay: '4s', duration: '11s' },
+    { size: 14, left: '72%', delay: '3s', duration: '9s' },
+    { size: 10, left: '85%', delay: '5s', duration: '8.5s' },
+    { size: 7, left: '92%', delay: '7s', duration: '13s' },
+    { size: 16, left: '5%', delay: '8s', duration: '9.5s' },
+    { size: 9, left: '55%', delay: '9s', duration: '10.5s' },
+    { size: 4, left: '40%', delay: '1.5s', duration: '14s' },
+    { size: 11, left: '65%', delay: '3.5s', duration: '8s' },
+  ];
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {bubbles.map((bubble, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full"
+          style={{
+            width: bubble.size,
+            height: bubble.size,
+            left: bubble.left,
+            bottom: '-20px',
+            background: i % 3 === 0
+              ? 'radial-gradient(circle at 30% 30%, rgba(0, 122, 255, 0.25), rgba(0, 122, 255, 0.05))'
+              : i % 3 === 1
+                ? 'radial-gradient(circle at 30% 30%, rgba(88, 86, 214, 0.2), rgba(88, 86, 214, 0.04))'
+                : 'radial-gradient(circle at 30% 30%, rgba(175, 82, 222, 0.2), rgba(175, 82, 222, 0.04))',
+            animation: `bubbleFloat ${bubble.duration} ease-in-out ${bubble.delay} infinite`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function ParticleField() {
+  const particles = [
+    { size: 3, left: '8%', delay: '0s', duration: '6s' },
+    { size: 2, left: '20%', delay: '2s', duration: '8s' },
+    { size: 4, left: '42%', delay: '1s', duration: '7s' },
+    { size: 2, left: '58%', delay: '3s', duration: '9s' },
+    { size: 3, left: '78%', delay: '4s', duration: '6.5s' },
+    { size: 2, left: '90%', delay: '5s', duration: '7.5s' },
+    { size: 3, left: '30%', delay: '6s', duration: '10s' },
+    { size: 2, left: '68%', delay: '7s', duration: '8.5s' },
+  ];
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {particles.map((p, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full bg-[#007AFF]/15"
+          style={{
+            width: p.size,
+            height: p.size,
+            left: p.left,
+            bottom: '-10px',
+            animation: `particleDrift ${p.duration} ease-in-out ${p.delay} infinite`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function LoginPage() {
   const { setUser, setCurrentView } = useAppStore();
   const [username, setUsername] = useState('');
@@ -67,7 +175,19 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[#f2f2f7] dark:bg-gray-950">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden login-bg-particles dark:bg-gray-950">
+      {/* Background gradient layers */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#007AFF]/8 via-transparent to-[#007AFF]/5 dark:from-[#007AFF]/5 dark:to-[#007AFF]/3" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#007AFF]/5 dark:bg-[#007AFF]/8 rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-[#5856D6]/3 dark:bg-[#5856D6]/5 rounded-full blur-3xl" />
+      <div className="absolute top-1/4 right-0 w-[300px] h-[300px] bg-[#AF52DE]/3 dark:bg-[#AF52DE]/5 rounded-full blur-3xl" />
+      <div className="login-particles-inner" />
+
+      {/* Water wave background */}
+      <WaterWaves />
+      <FloatingBubbles />
+      <ParticleField />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
