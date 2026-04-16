@@ -27,6 +27,7 @@ import {
   AlertCircle,
   CheckCircle2,
 } from 'lucide-react';
+import { SarIcon } from '@/components/shared/sar-icon';
 
 interface ProductItem {
   id: string;
@@ -367,7 +368,7 @@ export function InvoiceForm() {
                     >
                       <Droplets className="w-3.5 h-3.5" />
                       <span>{product.name}</span>
-                      <span className="opacity-70">{product.price} ر.س</span>
+                      <span className="opacity-70">{product.price} <SarIcon className="inline" size={10} /></span>
                     </motion.button>
                   );
                 })}
@@ -420,7 +421,7 @@ export function InvoiceForm() {
                     المجموع
                   </div>
                   <div className="px-3 py-2.5 text-sm font-bold text-gray-900 dark:text-white text-center">
-                    {total.toLocaleString('ar-SA')} <span className="text-[11px] font-normal text-gray-400">ر.س</span>
+                    {total.toLocaleString('ar-SA')} <SarIcon className="text-gray-400" size={11} />
                   </div>
                 </div>
               )}
@@ -439,7 +440,7 @@ export function InvoiceForm() {
                   <span className="normal-case font-bold text-[#007AFF] text-[11px]">{discountValue}%</span>
                 )}
                 {discountType === 'fixed' && discountValue && !showDiscount && (
-                  <span className="normal-case font-bold text-[#007AFF] text-[11px]">{Number(discountValue).toLocaleString('ar-SA')} ر.س</span>
+                  <span className="normal-case font-bold text-[#007AFF] text-[11px]">{Number(discountValue).toLocaleString('ar-SA')} <SarIcon className="inline" size={11} /></span>
                 )}
               </span>
               {showDiscount ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
@@ -478,7 +479,7 @@ export function InvoiceForm() {
                         className="bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 dark:text-white rounded-xl h-10 text-sm"
                       />
                       {discountType === 'percentage' && discountValue && (
-                        <p className="text-[10px] text-gray-400 mt-1">خصم: {discountAmount.toLocaleString('ar-SA')} ر.س</p>
+                        <p className="text-[10px] text-gray-400 mt-1">خصم: {discountAmount.toLocaleString('ar-SA')} <SarIcon className="inline" size={10} /></p>
                       )}
                     </div>
                   )}
@@ -531,16 +532,16 @@ export function InvoiceForm() {
               {finalTotal > 0 && (
                 <div className="flex items-center gap-2">
                   {discountAmount > 0 && (
-                    <span className="text-[11px] text-red-500 line-through">{total.toLocaleString('ar-SA')} ر.س</span>
+                    <span className="text-[11px] text-red-500 line-through">{total.toLocaleString('ar-SA')} <SarIcon className="inline" size={11} /></span>
                   )}
                   <p className="text-sm font-extrabold text-gray-900 dark:text-white">
-                    {finalTotal.toLocaleString('ar-SA')} <span className="text-xs font-normal text-gray-400">ر.س</span>
+                    {finalTotal.toLocaleString('ar-SA')} <SarIcon className="text-gray-400" />
                   </p>
                 </div>
               )}
             </div>
             <div>
-              <label className="text-[11px] text-gray-500 mb-1 block">المبلغ المدفوع (ر.س)</label>
+              <label className="text-[11px] text-gray-500 mb-1 block">المبلغ المدفوع (<SarIcon className="inline" size={10} />)</label>
               <Input
                 type="number"
                 value={paidAmount}
@@ -557,7 +558,7 @@ export function InvoiceForm() {
                 className="flex items-center gap-1.5 mt-2 text-[11px] text-[#FF3B30] bg-[#FF3B30]/5 px-2.5 py-1.5 rounded-lg"
               >
                 <AlertCircle className="w-3 h-3" />
-                سيُسجل {debt.toLocaleString('ar-SA')} ر.س كدين
+                سيُسجل {debt.toLocaleString('ar-SA')} <SarIcon className="inline" size={11} /> كدين
               </motion.div>
             )}
             {credit > 0 && (
@@ -567,7 +568,7 @@ export function InvoiceForm() {
                 className="flex items-center gap-1.5 mt-2 text-[11px] text-[#34C759] bg-[#34C759]/5 px-2.5 py-1.5 rounded-lg"
               >
                 <CheckCircle2 className="w-3 h-3" />
-                سيُضاف {credit.toLocaleString('ar-SA')} ر.س لرصيد العميل
+                سيُضاف {credit.toLocaleString('ar-SA')} <SarIcon className="inline" size={11} /> لرصيد العميل
               </motion.div>
             )}
           </div>
@@ -605,7 +606,7 @@ export function InvoiceForm() {
               تسجيل دين
             </AlertDialogTitle>
             <AlertDialogDescription>
-              سيتم قبض {confirmData.paid.toLocaleString('ar-SA')} ر.س وتسجيل الباقي {confirmData.debt.toLocaleString('ar-SA')} ر.س كدين على العميل
+              سيتم قبض {confirmData.paid.toLocaleString('ar-SA')} <SarIcon className="inline" size={11} /> وتسجيل الباقي {confirmData.debt.toLocaleString('ar-SA')} <SarIcon className="inline" size={11} /> كدين على العميل
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -630,7 +631,7 @@ export function InvoiceForm() {
               إضافة رصيد
             </AlertDialogTitle>
             <AlertDialogDescription>
-              سيتم قبض {confirmData.finalTotal.toLocaleString('ar-SA')} ر.س للفاتورة وإضافة {confirmData.credit.toLocaleString('ar-SA')} ر.س لرصيد العميل
+              سيتم قبض {confirmData.finalTotal.toLocaleString('ar-SA')} <SarIcon className="inline" size={11} /> للفاتورة وإضافة {confirmData.credit.toLocaleString('ar-SA')} <SarIcon className="inline" size={11} /> لرصيد العميل
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -37,6 +37,7 @@ import {
   Percent,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SarIcon } from '@/components/shared/sar-icon';
 import { Button } from '@/components/ui/button';
 import { RepLeaderboard } from '@/components/admin/rep-leaderboard';
 import { InvoiceAging } from '@/components/admin/invoice-aging';
@@ -546,7 +547,7 @@ export function Dashboard() {
               </div>
               <div className="bg-white/10 rounded-xl p-3 backdrop-blur-sm">
                 <p className="text-2xl font-bold"><AnimatedNumber value={stats.todayRevenue} duration={800} /></p>
-                <p className="text-xs opacity-70">إيرادات اليوم (ر.س)</p>
+                <p className="text-xs opacity-70">إيرادات اليوم (<SarIcon size={12} className="opacity-70" />)</p>
               </div>
             </div>
           </div>
@@ -762,8 +763,8 @@ export function Dashboard() {
                       </div>
                     </div>
                     <div className="text-left shrink-0 mr-3">
-                      <p className="text-sm font-bold text-[#FF3B30]">
-                        <AnimatedNumber value={debtor.totalDebt} duration={800} /> ر.س
+                      <p className="text-sm font-bold text-[#FF3B30] flex items-center gap-0.5">
+                        <AnimatedNumber value={debtor.totalDebt} duration={800} /> <SarIcon size={14} className="text-[#FF3B30]" />
                       </p>
                       <p className="text-[10px] text-gray-400">{formatTime(debtor.lastInvoiceDate)}</p>
                     </div>
@@ -774,7 +775,7 @@ export function Dashboard() {
                 <p className="text-[11px] text-gray-500 text-center">
                   إجمالي ديون أعلى {topDebtors.length} عملاء:{' '}
                   <span className="font-bold text-[#FF3B30]">
-                    {topDebtors.reduce((sum, d) => sum + d.totalDebt, 0).toLocaleString('ar-SA')} ر.س
+                    {topDebtors.reduce((sum, d) => sum + d.totalDebt, 0).toLocaleString('ar-SA')} <SarIcon size={14} className="text-[#FF3B30]" />
                   </span>
                 </p>
               </div>
@@ -981,7 +982,7 @@ export function Dashboard() {
                       <p className="text-[11px] text-gray-500">{c.invoiceCount} فاتورة</p>
                     </div>
                   </div>
-                  <p className="text-sm font-bold text-[#1c1c1e] dark:text-white"><AnimatedNumber value={c.total} duration={800} /> ر.س</p>
+                  <p className="text-sm font-bold text-[#1c1c1e] dark:text-white flex items-center gap-0.5"><AnimatedNumber value={c.total} duration={800} /> <SarIcon size={14} /></p>
                 </div>
               ))}
             </div>

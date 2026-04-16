@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Wallet, Banknote, ArrowLeftRight, FileCheck, Loader2, Printer } from 'lucide-react';
+import { SarIcon } from '@/components/shared/sar-icon';
 
 interface ReceiptFormProps {
   open: boolean;
@@ -210,7 +211,7 @@ export function ReceiptForm({ open, onOpenChange, onSuccess }: ReceiptFormProps)
         >
           <div className="flex-1">
             <p className="font-semibold text-sm">تم إنشاء السند {lastReceipt.receiptNo}</p>
-            <p className="text-xs text-gray-500">المبلغ: {lastReceipt.amount.toLocaleString('ar-SA')} ر.س</p>
+            <p className="text-xs text-gray-500">المبلغ: {lastReceipt.amount.toLocaleString('ar-SA')} <SarIcon className="inline" size={10} /></p>
           </div>
           <Button
             onClick={handlePrintReceipt}
@@ -256,7 +257,7 @@ export function ReceiptForm({ open, onOpenChange, onSuccess }: ReceiptFormProps)
             transition={{ delay: 0.1 }}
             className="bg-white rounded-2xl p-5 shadow-sm -mt-4"
           >
-            <label className="text-sm font-semibold text-gray-700 mb-3 block">المبلغ (ر.س)</label>
+            <label className="text-sm font-semibold text-gray-700 mb-3 block">المبلغ (<SarIcon className="inline" size={10} />)</label>
             <div className="relative">
               <input
                 type="number"
@@ -269,7 +270,7 @@ export function ReceiptForm({ open, onOpenChange, onSuccess }: ReceiptFormProps)
                 className="w-full text-3xl font-bold text-center py-3 bg-gray-50 rounded-xl border-2 border-gray-200 focus:border-[#34C759] focus:ring-0 focus:outline-none transition-colors text-[#1c1c1e] placeholder:text-gray-300"
               />
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-semibold text-gray-400">
-                ر.س
+                <SarIcon />
               </span>
             </div>
           </motion.div>
@@ -327,20 +328,20 @@ export function ReceiptForm({ open, onOpenChange, onSuccess }: ReceiptFormProps)
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-gray-500">الرصيد الحالي</span>
               <span className={`text-sm font-bold ${currentBalance >= 0 ? 'text-[#34C759]' : 'text-[#FF3B30]'}`}>
-                {currentBalance.toLocaleString('ar-SA')} ر.س
+                {currentBalance.toLocaleString('ar-SA')} <SarIcon className="inline" />
               </span>
             </div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm text-gray-500">المبلغ المدفوع</span>
               <span className="text-sm font-bold text-[#34C759]">
-                +{parsedAmount.toLocaleString('ar-SA')} ر.س
+                +{parsedAmount.toLocaleString('ar-SA')} <SarIcon className="inline" />
               </span>
             </div>
             <div className="border-t border-gray-200 my-2" />
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-gray-700">الرصيد بعد الدفع</span>
               <span className={`text-base font-bold ${newBalance >= 0 ? 'text-[#34C759]' : 'text-[#FF3B30]'}`}>
-                {newBalance.toLocaleString('ar-SA')} ر.س
+                {newBalance.toLocaleString('ar-SA')} <SarIcon className="inline" />
               </span>
             </div>
           </motion.div>

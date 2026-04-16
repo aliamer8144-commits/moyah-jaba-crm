@@ -15,6 +15,7 @@ import { Search, Users, Phone, Building2, Wallet, MapPin, X, FileText, Download 
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { SarIcon } from '@/components/shared/sar-icon';
 
 const stagger = {
   animate: { transition: { staggerChildren: 0.05 } },
@@ -193,8 +194,8 @@ export function AdminClients() {
                 <Wallet className={`w-4 h-4 ${selectedClient.walletBalance >= 0 ? 'text-[#34C759]' : 'text-[#FF3B30]'}`} />
                 <span className="text-sm font-medium">رصيد المحفظة</span>
               </div>
-              <span className={`font-bold ${selectedClient.walletBalance >= 0 ? 'text-[#34C759]' : 'text-[#FF3B30]'}`}>
-                {selectedClient.walletBalance.toLocaleString('ar-SA')} ر.س
+              <span className={`font-bold ${selectedClient.walletBalance >= 0 ? 'text-[#34C759]' : 'text-[#FF3B30]'} flex items-center gap-0.5`}>
+                {selectedClient.walletBalance.toLocaleString('ar-SA')} <SarIcon size={14} className={selectedClient.walletBalance >= 0 ? 'text-[#34C759]' : 'text-[#FF3B30]'} />
               </span>
             </div>
           </div>

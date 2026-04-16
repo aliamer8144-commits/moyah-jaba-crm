@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore, Client, Invoice } from '@/lib/store';
 import { Users, FileText, Package, AlertCircle, Clock, Sparkles, TrendingUp, Target, DollarSign, MapPin as MapPinIcon, Trophy, Wallet } from 'lucide-react';
+import { SarIcon } from '@/components/shared/sar-icon';
 import { DailyGoals } from '@/components/rep/daily-goals';
 import { AchievementBadges } from '@/components/rep/achievement-badges';
 import { WeeklySummary } from '@/components/rep/weekly-summary';
@@ -735,7 +736,7 @@ export function RepHome() {
                       </span>
                       <span className="text-gray-500">
                         <span className="font-bold text-[#1c1c1e] dark:text-white">{item.total.toLocaleString('ar-SA')}</span>
-                        {' '}ر.س ({item.count} فاتورة)
+                        {' '}<SarIcon className="inline" size={10} /> ({item.count} فاتورة)
                       </span>
                     </div>
                     <div className="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">

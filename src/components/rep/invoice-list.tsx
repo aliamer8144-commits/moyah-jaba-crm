@@ -15,6 +15,7 @@ import {
   TrendingUp,
   Wallet,
 } from 'lucide-react';
+import { SarIcon } from '@/components/shared/sar-icon';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -506,7 +507,7 @@ export function InvoiceList() {
                     )}
                   </div>
                   <p className="text-base font-extrabold text-[#1c1c1e] dark:text-white shrink-0">
-                    {formatCurrency(inv.finalTotal)} <span className="text-[10px] font-normal text-gray-400">ر.س</span>
+                    {formatCurrency(inv.finalTotal)} <SarIcon className="text-gray-400" size={10} />
                   </p>
                 </div>
               </motion.div>

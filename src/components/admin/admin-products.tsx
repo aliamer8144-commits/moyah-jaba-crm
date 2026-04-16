@@ -25,6 +25,7 @@ import {
   ToggleRight,
   AlertTriangle,
 } from 'lucide-react';
+import { SarIcon } from '@/components/shared/sar-icon';
 
 interface ProductItem {
   id: string;
@@ -267,7 +268,7 @@ export function AdminProducts() {
                   <div className="flex items-center gap-1">
                     <DollarSign className="w-4 h-4 text-[#34C759]" />
                     <span className="text-lg font-bold text-[#34C759]">{product.price.toLocaleString('ar-SA')}</span>
-                    <span className="text-xs text-gray-400">ر.س</span>
+                    <SarIcon size={12} className="text-gray-400" />
                   </div>
 
                   <div className="flex items-center gap-1">
@@ -479,7 +480,7 @@ function ProductFormDrawer({
           {/* Price */}
           <div className="space-y-1.5">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              السعر (ر.س)
+              السعر (<SarIcon size={12} className="text-gray-500" />)
               <span className="text-[#FF3B30] mr-1">*</span>
             </label>
             <div className="relative">

@@ -44,6 +44,7 @@ import {
   Banknote,
   CreditCard,
 } from 'lucide-react';
+import { SarIcon } from '@/components/shared/sar-icon';
 
 const stagger = {
   animate: { transition: { staggerChildren: 0.04 } },
@@ -232,7 +233,7 @@ export function AdminReceipts() {
                 {selectedReceipt.receiptNo}
               </span>
             </div>
-            <p className="text-3xl font-bold">{formatCurrency(selectedReceipt.amount)} ر.س</p>
+            <p className="text-3xl font-bold flex items-center gap-1">{formatCurrency(selectedReceipt.amount)} <SarIcon size={20} /></p>
             <p className="text-sm opacity-80 mt-1">
               {formatFullDate(selectedReceipt.createdAt)}
             </p>
@@ -371,7 +372,7 @@ export function AdminReceipts() {
           <div className="grid grid-cols-2 gap-2 text-center">
             <div>
               <p className="text-xs text-gray-500">إجمالي المبالغ</p>
-              <p className="text-sm font-bold text-[#34C759]">{formatCurrency(totalAmount)} ر.س</p>
+              <p className="text-sm font-bold text-[#34C759] flex items-center gap-0.5">{formatCurrency(totalAmount)} <SarIcon size={14} className="text-[#34C759]" /></p>
             </div>
             <div>
               <p className="text-xs text-gray-500">عدد السندات</p>
@@ -432,7 +433,7 @@ export function AdminReceipts() {
                         <td className="px-4 py-3 font-medium text-[#007AFF]">{rc.receiptNo}</td>
                         <td className="px-4 py-3">{rc.rep?.name || '-'}</td>
                         <td className="px-4 py-3">{rc.client?.name || '-'}</td>
-                        <td className="px-4 py-3 font-bold text-[#34C759]">{formatCurrency(rc.amount)} ر.س</td>
+                        <td className="px-4 py-3 font-bold text-[#34C759]">{formatCurrency(rc.amount)} <SarIcon size={14} className="text-[#34C759]" /></td>
                         <td className="px-4 py-3">
                           <span className={`text-xs px-2 py-0.5 rounded-lg font-medium inline-flex items-center gap-1 ${badge.color}`}>
                             <MethodIcon className="w-3 h-3" />

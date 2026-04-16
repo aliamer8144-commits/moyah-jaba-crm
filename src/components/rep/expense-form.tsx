@@ -23,6 +23,7 @@ import {
   Receipt,
   CalendarDays,
 } from 'lucide-react';
+import { SarIcon } from '@/components/shared/sar-icon';
 
 const categoryOptions = [
   { id: 'fuel', label: 'وقود', icon: Zap, color: '#FF9500' },
@@ -164,7 +165,7 @@ export function ExpenseForm({ open, onOpenChange, onSuccess }: ExpenseFormProps)
 
           {/* Amount Input */}
           <div>
-            <label className="text-sm font-semibold text-[#1c1c1e] mb-2 block">المبلغ (ر.س)</label>
+            <label className="text-sm font-semibold text-[#1c1c1e] mb-2 block">المبلغ (<SarIcon className="inline" size={10} />)</label>
             <div className="relative">
               <Input
                 type="number"
@@ -177,7 +178,7 @@ export function ExpenseForm({ open, onOpenChange, onSuccess }: ExpenseFormProps)
                 step="0.01"
               />
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">
-                ر.س
+                <SarIcon />
               </span>
             </div>
           </div>

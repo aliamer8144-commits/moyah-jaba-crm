@@ -11,6 +11,7 @@ import {
   AlertCircle,
   Clock,
 } from 'lucide-react';
+import { SarIcon } from '@/components/shared/sar-icon';
 
 interface TimelineItem {
   type: 'payment' | 'invoice';
@@ -247,12 +248,12 @@ export function PaymentTimeline({ clientId }: { clientId: string }) {
                       <div className="flex items-center justify-between">
                         <span className={`text-sm font-bold number-mono ${isPayment ? 'text-[#34C759]' : 'text-gray-800 dark:text-white'}`}>
                           {isPayment ? '+' : ''}
-                          {item.amount.toLocaleString('ar-SA')} ر.س
+                          {item.amount.toLocaleString('ar-SA')} <SarIcon className="inline" size={11} />
                         </span>
                         <span className={`text-[11px] number-mono ${
                           item.runningBalance > 0 ? 'text-[#FF3B30]' : item.runningBalance < 0 ? 'text-[#34C759]' : 'text-gray-400'
                         }`}>
-                          الرصيد: {Math.abs(item.runningBalance).toLocaleString('ar-SA')} ر.س
+                          الرصيد: {Math.abs(item.runningBalance).toLocaleString('ar-SA')} <SarIcon className="inline" size={11} />
                         </span>
                       </div>
 

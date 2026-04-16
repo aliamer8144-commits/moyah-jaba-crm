@@ -18,6 +18,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { ExpenseForm } from './expense-form';
+import { SarIcon } from '@/components/shared/sar-icon';
 
 interface Expense {
   id: string;
@@ -226,7 +227,7 @@ export function ExpenseTracker() {
               <span className="text-xs text-gray-500">مصروفات اليوم</span>
             </div>
             <p className="text-xl font-bold text-[#FF3B30]">{todayTotal.toLocaleString('ar-SA')}</p>
-            <p className="text-[10px] text-gray-400 mt-0.5">ر.س</p>
+            <p className="text-[10px] text-gray-400 mt-0.5"><SarIcon size={10} /></p>
           </div>
           <div className="bg-gradient-to-br from-[#FF9500]/5 to-white rounded-2xl p-4 shadow-sm border border-[#FF9500]/10">
             <div className="flex items-center gap-2 mb-2">
@@ -234,7 +235,7 @@ export function ExpenseTracker() {
               <span className="text-xs text-gray-500">هذا الشهر</span>
             </div>
             <p className="text-xl font-bold text-[#FF9500]">{monthTotal.toLocaleString('ar-SA')}</p>
-            <p className="text-[10px] text-gray-400 mt-0.5">ر.س</p>
+            <p className="text-[10px] text-gray-400 mt-0.5"><SarIcon size={10} /></p>
           </div>
         </motion.div>
 
@@ -290,7 +291,7 @@ export function ExpenseTracker() {
               {filteredExpenses.length} مصروف
             </span>
             <span className="text-sm font-bold text-[#FF3B30]">
-              الإجمالي: {filteredTotal.toLocaleString('ar-SA')} ر.س
+              الإجمالي: {filteredTotal.toLocaleString('ar-SA')} <SarIcon className="inline" size={10} />
             </span>
           </motion.div>
         )}
@@ -388,7 +389,7 @@ export function ExpenseTracker() {
                       <div className="flex flex-col items-end gap-1.5 shrink-0">
                         <p className="text-base font-bold text-[#FF3B30]">
                           -{expense.amount.toLocaleString('ar-SA')}
-                          <span className="text-[10px] font-normal text-gray-400 mr-0.5">ر.س</span>
+                          <SarIcon className="text-gray-400 mr-0.5" size={10} />
                         </p>
                         <button
                           onClick={(e) => {

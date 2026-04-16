@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SarIcon } from '@/components/shared/sar-icon';
 import { Trophy, Crown, Medal, Users, FileText, DollarSign, UserCircle } from 'lucide-react';
 
 interface RepData {
@@ -124,7 +125,7 @@ export function RepLeaderboard() {
                     <span className="absolute -top-1 -right-1 text-sm">{podiumColors[1].label}</span>
                   </div>
                   <p className="text-xs font-bold text-[#1c1c1e] dark:text-white truncate w-full text-center">{top3[1].name}</p>
-                  <p className="text-[10px] text-gray-500 mt-0.5">{top3[1].totalRevenue.toLocaleString('ar-SA')} ر.س</p>
+                  <p className="text-[10px] text-gray-500 mt-0.5">{top3[1].totalRevenue.toLocaleString('ar-SA')} <SarIcon size={10} className="text-gray-500" /></p>
                   <div className={`w-full mt-2 bg-gradient-to-t ${podiumColors[1].bg} rounded-t-xl flex items-end justify-center pb-2 ${podiumColors[1].shadow}`}
                     style={{ height: '80px' }}>
                     <span className="text-white font-bold text-lg">2</span>
@@ -141,7 +142,7 @@ export function RepLeaderboard() {
                     <span className="absolute -top-1 -right-1 text-base">{podiumColors[0].label}</span>
                   </div>
                   <p className="text-sm font-bold text-[#1c1c1e] dark:text-white truncate w-full text-center">{top3[0].name}</p>
-                  <p className="text-[11px] text-[#FFD700] font-bold mt-0.5">{top3[0].totalRevenue.toLocaleString('ar-SA')} ر.س</p>
+                  <p className="text-[11px] text-[#FFD700] font-bold mt-0.5">{top3[0].totalRevenue.toLocaleString('ar-SA')} <SarIcon size={11} className="text-[#FFD700]" /></p>
                   <div className={`w-full mt-2 bg-gradient-to-t ${podiumColors[0].bg} rounded-t-xl flex items-end justify-center pb-2 ${podiumColors[0].shadow}`}
                     style={{ height: '100px' }}>
                     <span className="text-white font-bold text-2xl">1</span>
@@ -157,7 +158,7 @@ export function RepLeaderboard() {
                     <span className="absolute -top-1 -right-1 text-sm">{podiumColors[2].label}</span>
                   </div>
                   <p className="text-xs font-bold text-[#1c1c1e] dark:text-white truncate w-full text-center">{top3[2].name}</p>
-                  <p className="text-[10px] text-gray-500 mt-0.5">{top3[2].totalRevenue.toLocaleString('ar-SA')} ر.س</p>
+                  <p className="text-[10px] text-gray-500 mt-0.5">{top3[2].totalRevenue.toLocaleString('ar-SA')} <SarIcon size={10} className="text-gray-500" /></p>
                   <div className={`w-full mt-2 bg-gradient-to-t ${podiumColors[2].bg} rounded-t-xl flex items-end justify-center pb-2 ${podiumColors[2].shadow}`}
                     style={{ height: '60px' }}>
                     <span className="text-white font-bold text-lg">3</span>
@@ -190,7 +191,7 @@ export function RepLeaderboard() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <p className="text-sm font-semibold text-[#1c1c1e] dark:text-white truncate">{rep.name}</p>
-                        <p className="text-xs font-bold text-[#007AFF] shrink-0">{rep.totalRevenue.toLocaleString('ar-SA')} ر.س</p>
+                        <p className="text-xs font-bold text-[#007AFF] shrink-0">{rep.totalRevenue.toLocaleString('ar-SA')} <SarIcon size={12} className="text-[#007AFF]" /></p>
                       </div>
                       <div className="h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
                         <motion.div
@@ -222,7 +223,7 @@ export function RepLeaderboard() {
             <div className="flex items-center justify-between">
               <p className="text-[11px] text-gray-500">إجمالي مبيعات المناديب</p>
               <p className="text-[11px] font-bold text-[#FFD700]">
-                {reps.reduce((s, r) => s + r.totalRevenue, 0).toLocaleString('ar-SA')} ر.س
+                {reps.reduce((s, r) => s + r.totalRevenue, 0).toLocaleString('ar-SA')} <SarIcon size={11} className="text-[#FFD700]" />
               </p>
             </div>
           </div>

@@ -26,6 +26,7 @@ import {
   Tag,
 } from 'lucide-react';
 import { VisitLog } from '@/components/rep/visit-log';
+import { SarIcon } from '@/components/shared/sar-icon';
 import { CallLog } from '@/components/rep/call-log';
 import { ClientInsights } from '@/components/rep/client-insights';
 import { ClientTrustBadge } from '@/components/rep/client-trust-badge';
@@ -434,7 +435,7 @@ export function ClientProfile({ onBack, onRefresh }: { onBack: () => void; onRef
             <span className="font-semibold text-sm">رصيد المحفظة</span>
           </div>
           <span className={`text-lg font-bold ${client.walletBalance >= 0 ? 'text-[#34C759]' : 'text-[#FF3B30]'}`}>
-            {client.walletBalance.toLocaleString('ar-SA')} ر.س
+            {client.walletBalance.toLocaleString('ar-SA')} <SarIcon className="inline" />
           </span>
         </div>
         <p className="text-xs text-gray-400 mt-2">

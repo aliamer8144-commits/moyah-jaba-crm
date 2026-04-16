@@ -22,6 +22,7 @@ import {
   ChevronLeft,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { SarIcon } from '@/components/shared/sar-icon';
 
 const fadeUp = {
   initial: { opacity: 0, y: 15 },
@@ -306,7 +307,7 @@ export function AdminReports() {
               </div>
               <p className="text-[11px] text-gray-500 font-medium mb-1">إجمالي الإيرادات</p>
               <p className="text-2xl font-bold text-[#1c1c1e] dark:text-white">{formatCurrency(data.revenue.total)}</p>
-              <p className="text-[10px] text-gray-400 mt-1">ر.س</p>
+              <p className="text-[10px] text-gray-400 mt-1"><SarIcon size={10} className="text-gray-400" /></p>
             </motion.div>
 
             {/* Collection Rate */}
@@ -353,7 +354,7 @@ export function AdminReports() {
               </div>
               <p className="text-[11px] text-gray-500 font-medium mb-1">متوسط قيمة الفاتورة</p>
               <p className="text-2xl font-bold text-[#1c1c1e] dark:text-white">{formatCurrency(Math.round(data.revenue.avgInvoiceValue))}</p>
-              <p className="text-[10px] text-gray-400 mt-1">ر.س</p>
+              <p className="text-[10px] text-gray-400 mt-1"><SarIcon size={10} className="text-gray-400" /></p>
             </motion.div>
 
             {/* New Clients */}
@@ -399,7 +400,7 @@ export function AdminReports() {
                       <span className="text-sm font-medium text-[#1c1c1e] dark:text-white">{item.size}</span>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-400">{item.count} فاتورة</span>
-                        <span className="text-sm font-bold text-[#1c1c1e] dark:text-white">{formatCurrency(item.revenue)} ر.س</span>
+                        <span className="text-sm font-bold text-[#1c1c1e] dark:text-white flex items-center gap-0.5">{formatCurrency(item.revenue)} <SarIcon size={14} /></span>
                       </div>
                     </div>
                     <div className="w-full h-3 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
@@ -455,7 +456,7 @@ export function AdminReports() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <h4 className="font-semibold text-sm text-[#1c1c1e] dark:text-white truncate">{rep.name}</h4>
-                      <span className="text-sm font-bold text-[#007AFF]">{formatCurrency(rep.revenue)} ر.س</span>
+                      <span className="text-sm font-bold text-[#007AFF] flex items-center gap-0.5">{formatCurrency(rep.revenue)} <SarIcon size={14} className="text-[#007AFF]" /></span>
                     </div>
                     <div className="flex items-center gap-3 mt-1">
                       <span className="text-[11px] text-gray-500 flex items-center gap-1">
@@ -573,21 +574,21 @@ export function AdminReports() {
                     <div className="w-3 h-3 rounded-full bg-[#34C759]" />
                     <div>
                       <p className="text-xs text-gray-500">مدفوعة</p>
-                      <p className="text-sm font-bold text-[#34C759]">{formatCurrency(data.revenue.paid)} ر.س</p>
+                      <p className="text-sm font-bold text-[#34C759] flex items-center gap-0.5">{formatCurrency(data.revenue.paid)} <SarIcon size={14} className="text-[#34C759]" /></p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-[#FF3B30]" />
                     <div>
                       <p className="text-xs text-gray-500">ديون</p>
-                      <p className="text-sm font-bold text-[#FF3B30]">{formatCurrency(data.revenue.debt)} ر.س</p>
+                      <p className="text-sm font-bold text-[#FF3B30] flex items-center gap-0.5">{formatCurrency(data.revenue.debt)} <SarIcon size={14} className="text-[#FF3B30]" /></p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-gray-200" />
                     <div>
                       <p className="text-xs text-gray-500">الإجمالي</p>
-                      <p className="text-sm font-bold text-[#1c1c1e] dark:text-white">{formatCurrency(data.revenue.total)} ر.س</p>
+                      <p className="text-sm font-bold text-[#1c1c1e] dark:text-white flex items-center gap-0.5">{formatCurrency(data.revenue.total)} <SarIcon size={14} /></p>
                     </div>
                   </div>
                 </div>
@@ -622,7 +623,7 @@ export function AdminReports() {
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] text-gray-400">{client.invoiceCount} فاتورة</span>
                         <span className="text-[10px] text-gray-300">|</span>
-                        <span className="text-[10px] font-medium text-[#007AFF]">{formatCurrency(client.totalRevenue)} ر.س</span>
+                        <span className="text-[10px] font-medium text-[#007AFF] flex items-center gap-0.5">{formatCurrency(client.totalRevenue)} <SarIcon size={10} className="text-[#007AFF]" /></span>
                       </div>
                     </div>
                   </motion.div>
@@ -755,7 +756,7 @@ export function AdminReports() {
                   {/* Total */}
                   <div className="text-left shrink-0">
                     <p className="text-sm font-bold text-[#1c1c1e] dark:text-white">{formatCurrency(client.totalPurchases)}</p>
-                    <p className="text-[10px] text-gray-400">ر.س</p>
+                    <p className="text-[10px] text-gray-400"><SarIcon size={10} className="text-gray-400" /></p>
                   </div>
                 </motion.div>
               );

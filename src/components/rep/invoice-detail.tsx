@@ -30,6 +30,7 @@ import {
   User,
   MoreVertical,
 } from 'lucide-react';
+import { SarIcon } from '@/components/shared/sar-icon';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -289,7 +290,7 @@ export function InvoiceDetail({
               className="w-full h-9 rounded-xl font-semibold text-xs bg-gradient-to-l from-emerald-500 to-emerald-600 text-white shadow-sm shadow-emerald-500/20 hover:shadow-emerald-500/30"
             >
               <CreditCard className="w-3.5 h-3.5 ml-1.5" />
-              تسجيل دفعة ({formatCurrency(invoice.debtAmount)} ر.س)
+              تسجيل دفعة ({formatCurrency(invoice.debtAmount)} <SarIcon className="inline text-white" />)
             </Button>
           </motion.div>
         )}
@@ -368,7 +369,7 @@ export function InvoiceDetail({
                 {invoice.quantity}
               </div>
               <div className="px-4 py-3 flex items-center justify-center text-sm text-gray-800 dark:text-white border-b border-gray-50 dark:border-gray-800 border-r border-gray-100 dark:border-gray-800">
-                {formatCurrency(invoice.price)} <span className="text-[10px] text-gray-400 mr-0.5">ر.س</span>
+                {formatCurrency(invoice.price)} <SarIcon className="text-gray-400 mr-0.5" size={10} />
               </div>
             </div>
             {/* Promotion Row */}
@@ -389,7 +390,7 @@ export function InvoiceDetail({
                 المجموع
               </div>
               <div className="px-4 py-3 flex items-center justify-center text-sm font-bold text-gray-900 dark:text-white">
-                {formatCurrency(invoice.total)} <span className="text-[10px] font-normal text-gray-400 mr-0.5">ر.س</span>
+                {formatCurrency(invoice.total)} <SarIcon className="text-gray-400 mr-0.5" size={10} />
               </div>
             </div>
           </div>
@@ -416,14 +417,14 @@ export function InvoiceDetail({
                   </span>
                 </div>
                 <span className="text-sm font-bold text-red-500">
-                  -{formatCurrency(invoice.discountValue)} ر.س
+                  -{formatCurrency(invoice.discountValue)} <SarIcon className="text-red-500 inline" />
                 </span>
               </div>
               {/* Final Total - same size as discount, no separators */}
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-gray-900 dark:text-white">الإجمالي النهائي</span>
                 <span className="text-sm font-bold text-gray-900 dark:text-white">
-                  {formatCurrency(invoice.finalTotal)} ر.س
+                  {formatCurrency(invoice.finalTotal)} <SarIcon className="inline" />
                 </span>
               </div>
             </>
@@ -433,7 +434,7 @@ export function InvoiceDetail({
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-gray-900 dark:text-white">الإجمالي النهائي</span>
               <span className="text-sm font-bold text-gray-900 dark:text-white">
-                {formatCurrency(invoice.finalTotal)} ر.س
+                {formatCurrency(invoice.finalTotal)} <SarIcon className="inline" />
               </span>
             </div>
           )}
@@ -451,7 +452,7 @@ export function InvoiceDetail({
                 <span className="text-sm font-bold text-gray-900 dark:text-white">المدفوع</span>
               </div>
               <span className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">
-                {formatCurrency(invoice.paidAmount)} <span className="text-xs font-normal text-gray-400">ر.س</span>
+                {formatCurrency(invoice.paidAmount)} <SarIcon className="text-gray-400" size={12} />
               </span>
             </div>
           </div>
@@ -467,7 +468,7 @@ export function InvoiceDetail({
                   <span className="text-xs text-gray-400">المبلغ المدين</span>
                 </div>
                 <span className="text-sm font-bold text-red-500">
-                  {formatCurrency(invoice.debtAmount)} ر.س
+                  {formatCurrency(invoice.debtAmount)} <SarIcon className="text-red-500" size={12} />
                 </span>
               </div>
             )}
@@ -479,7 +480,7 @@ export function InvoiceDetail({
                   <span className="text-xs text-gray-400">رصيد إضافي</span>
                 </div>
                 <span className="text-sm font-bold text-blue-500">
-                  +{formatCurrency(invoice.creditAmount)} ر.س
+                  +{formatCurrency(invoice.creditAmount)} <SarIcon className="text-blue-500" size={12} />
                 </span>
               </div>
             )}
@@ -538,7 +539,7 @@ export function InvoiceDetail({
                 <AlertCircle className="w-3 h-3" />
                 المبلغ المدين المستحق
               </Label>
-              <p className="text-lg font-bold text-red-500">{formatCurrency(invoice.debtAmount)} ر.س</p>
+              <p className="text-lg font-bold text-red-500">{formatCurrency(invoice.debtAmount)} <SarIcon className="text-red-500" size={14} /></p>
             </div>
 
             <div>
@@ -556,7 +557,7 @@ export function InvoiceDetail({
                   className="h-12 rounded-xl text-lg font-bold text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 pl-16"
                   dir="ltr"
                 />
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-medium">ر.س</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><SarIcon /></span>
               </div>
             </div>
 

@@ -17,6 +17,7 @@ import {
   BarChart3,
   ArrowUpRight,
 } from 'lucide-react';
+import { SarIcon } from '@/components/shared/sar-icon';
 
 const fadeUp = {
   initial: { opacity: 0, y: 15 },
@@ -226,7 +227,7 @@ export function RepPerformance({ repId, repName, onBack }: { repId: string; repN
                   </div>
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-bold text-[#007AFF]">{formatCurrency(item.total)} ر.س</p>
+                  <p className="text-sm font-bold text-[#007AFF] flex items-center gap-0.5">{formatCurrency(item.total)} <SarIcon size={14} className="text-[#007AFF]" /></p>
                 </div>
               </div>
             ))}

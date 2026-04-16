@@ -14,6 +14,7 @@ import {
   Receipt,
   Loader2,
 } from 'lucide-react';
+import { SarIcon } from '@/components/shared/sar-icon';
 
 interface ClientInsightsData {
   totalPurchases: number;

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SarIcon } from '@/components/shared/sar-icon';
 import { Timer, AlertTriangle } from 'lucide-react';
 
 interface AgingBucket {
@@ -108,7 +109,7 @@ export function InvoiceAging() {
                 </div>
                 <div className="text-left shrink-0 w-24">
                   <p className="text-[11px] font-bold" style={{ color: bucket.color }}>
-                    {bucket.totalDebt.toLocaleString('ar-SA')} ر.س
+                    {bucket.totalDebt.toLocaleString('ar-SA')} <SarIcon size={11} className={bucket.color} />
                   </p>
                   <p className="text-[9px] text-gray-400">{bucket.count} فاتورة • {bucket.percentage}%</p>
                 </div>
@@ -125,7 +126,7 @@ export function InvoiceAging() {
               <p className="text-[11px] text-gray-500">إجمالي الديون المتقادمة</p>
             </div>
             <p className="text-[11px] font-bold text-[#FF3B30]">
-              {data.totalAgingDebt.toLocaleString('ar-SA')} ر.س
+              {data.totalAgingDebt.toLocaleString('ar-SA')} <SarIcon size={11} className="text-[#FF3B30]" />
             </p>
           </div>
         </div>

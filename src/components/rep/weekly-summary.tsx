@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
+import { SarIcon } from '@/components/shared/sar-icon';
 import { TrendingUp, TrendingDown, DollarSign, FileText, Users, Wallet, CalendarDays } from 'lucide-react';
 
 interface DailyData {
@@ -147,7 +148,7 @@ export function WeeklySummary() {
           icon={<DollarSign className="w-3.5 h-3.5" />}
           label="الإيرادات"
           value={thisWeek.revenue.toLocaleString('ar-SA')}
-          unit="ر.س"
+          unit={<SarIcon size={10} />}
           color="#34C759"
           change={getPercentChange(thisWeek.revenue, lastWeek.revenue)}
           delay={0}
@@ -174,7 +175,7 @@ export function WeeklySummary() {
           icon={<Wallet className="w-3.5 h-3.5" />}
           label="المحصل"
           value={thisWeek.collected.toLocaleString('ar-SA')}
-          unit="ر.س"
+          unit={<SarIcon size={10} />}
           color="#FF9500"
           change={getPercentChange(thisWeek.collected, lastWeek.collected)}
           delay={0.24}
@@ -233,7 +234,7 @@ function MiniStatRow({
   icon: React.ReactNode;
   label: string;
   value: string;
-  unit: string;
+  unit: React.ReactNode;
   color: string;
   change: number;
   delay: number;

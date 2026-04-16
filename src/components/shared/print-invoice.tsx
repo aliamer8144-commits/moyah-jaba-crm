@@ -1,6 +1,7 @@
 'use client';
 
 import { Invoice } from '@/lib/store';
+import { SarIcon } from '@/components/shared/sar-icon';
 
 interface PrintInvoiceProps {
   invoice: Invoice;
@@ -79,13 +80,13 @@ export function PrintInvoice({ invoice, repName }: PrintInvoiceProps) {
           <tr>
             <td>مياه جبأ</td>
             <td>{invoice.quantity}</td>
-            <td>{formatCurrency(invoice.price)} ر.س</td>
+            <td>{formatCurrency(invoice.price)} <SarIcon size={10} /></td>
           </tr>
         </tbody>
         <tfoot>
           <tr>
             <td colSpan={2} className="print-inv-total-label">المجموع</td>
-            <td className="print-inv-total-value">{formatCurrency(invoice.total)} ر.س</td>
+            <td className="print-inv-total-value">{formatCurrency(invoice.total)} <SarIcon size={10} /></td>
           </tr>
         </tfoot>
       </table>
@@ -104,33 +105,33 @@ export function PrintInvoice({ invoice, repName }: PrintInvoiceProps) {
         {hasDiscount && (
           <div className="print-inv-totals-row print-inv-discount">
             <span>الخصم {invoice.discountType === 'percentage' ? `(${discountPercent}%)` : ''}</span>
-            <span>-{formatCurrency(invoice.discountValue)} ر.س</span>
+            <span>-{formatCurrency(invoice.discountValue)} <SarIcon size={10} /></span>
           </div>
         )}
 
         <div className="print-inv-totals-row">
           <span>الإجمالي النهائي</span>
-          <span>{formatCurrency(invoice.finalTotal)} ر.س</span>
+          <span>{formatCurrency(invoice.finalTotal)} <SarIcon size={10} /></span>
         </div>
 
         <div className="print-inv-divider" />
 
         <div className="print-inv-totals-row print-inv-final">
           <span>المدفوع</span>
-          <span>{formatCurrency(invoice.paidAmount)} ر.س</span>
+          <span>{formatCurrency(invoice.paidAmount)} <SarIcon size={10} /></span>
         </div>
 
         {invoice.debtAmount > 0 && (
           <div className="print-inv-totals-row print-inv-debt">
             <span>المبلغ المدين</span>
-            <span>{formatCurrency(invoice.debtAmount)} ر.س</span>
+            <span>{formatCurrency(invoice.debtAmount)} <SarIcon size={10} /></span>
           </div>
         )}
 
         {invoice.creditAmount > 0 && (
           <div className="print-inv-totals-row print-inv-credit">
             <span>رصيد إضافي</span>
-            <span>+{formatCurrency(invoice.creditAmount)} ر.س</span>
+            <span>+{formatCurrency(invoice.creditAmount)} <SarIcon size={10} /></span>
           </div>
         )}
       </div>

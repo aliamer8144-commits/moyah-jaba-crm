@@ -56,6 +56,7 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { SarIcon } from '@/components/shared/sar-icon';
 
 const stagger = {
   animate: { transition: { staggerChildren: 0.04 } },
@@ -319,7 +320,7 @@ export function AdminInvoices() {
                 {selectedInvoice.id.slice(-6).toUpperCase()}
               </span>
             </div>
-            <p className="text-3xl font-bold">{selectedInvoice.finalTotal.toLocaleString('ar-SA')} ر.س</p>
+            <p className="text-3xl font-bold flex items-center gap-1">{selectedInvoice.finalTotal.toLocaleString('ar-SA')} <SarIcon size={20} /></p>
             <p className="text-sm opacity-80 mt-1">
               {new Date(selectedInvoice.createdAt).toLocaleDateString('ar-SA', {
                 year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -337,14 +338,14 @@ export function AdminInvoices() {
 
             <InfoRow icon={<Package className="w-4 h-4 text-gray-400" />} label="المنتج" value={`مياه جبأ - ${selectedInvoice.productSize}`} />
             <InfoRow icon={<Package className="w-4 h-4 text-gray-400" />} label="الكمية" value={`${selectedInvoice.quantity} كرتون`} />
-            <InfoRow icon={<DollarSign className="w-4 h-4 text-gray-400" />} label="سعر الوحدة" value={`${selectedInvoice.price.toLocaleString('ar-SA')} ر.س`} />
-            <InfoRow icon={<DollarSign className="w-4 h-4 text-gray-400" />} label="الإجمالي" value={`${selectedInvoice.total.toLocaleString('ar-SA')} ر.س`} />
+            <InfoRow icon={<DollarSign className="w-4 h-4 text-gray-400" />} label="سعر الوحدة" value={selectedInvoice.price.toLocaleString('ar-SA')} />
+            <InfoRow icon={<DollarSign className="w-4 h-4 text-gray-400" />} label="الإجمالي" value={selectedInvoice.total.toLocaleString('ar-SA')} />
 
             {selectedInvoice.discountType !== 'none' && selectedInvoice.discountValue > 0 && (
-              <InfoRow icon={<Percent className="w-4 h-4 text-[#FF3B30]" />} label="الخصم" value={`-${selectedInvoice.discountValue.toLocaleString('ar-SA')} ر.س`} className="text-[#FF3B30]" />
+              <InfoRow icon={<Percent className="w-4 h-4 text-[#FF3B30]" />} label="الخصم" value={'-' + selectedInvoice.discountValue.toLocaleString('ar-SA')} className="text-[#FF3B30]" />
             )}
 
-            <InfoRow icon={<DollarSign className="w-4 h-4 text-[#34C759]" />} label="الإجمالي النهائي" value={`${selectedInvoice.finalTotal.toLocaleString('ar-SA')} ر.س`} bold />
+            <InfoRow icon={<DollarSign className="w-4 h-4 text-[#34C759]" />} label="الإجمالي النهائي" value={selectedInvoice.finalTotal.toLocaleString('ar-SA')} bold />
 
             {selectedInvoice.promotionQty > 0 && (
               <div className="flex items-center gap-2 text-xs text-[#FF9500] bg-[#FF9500]/5 px-3 py-2 rounded-lg">
@@ -355,12 +356,12 @@ export function AdminInvoices() {
 
             <div className="h-px bg-gray-100" />
 
-            <InfoRow icon={<CreditCard className="w-4 h-4 text-[#34C759]" />} label="المدفوع" value={`${selectedInvoice.paidAmount.toLocaleString('ar-SA')} ر.س`} />
+            <InfoRow icon={<CreditCard className="w-4 h-4 text-[#34C759]" />} label="المدفوع" value={selectedInvoice.paidAmount.toLocaleString('ar-SA')} />
             {selectedInvoice.debtAmount > 0 && (
-              <InfoRow icon={<AlertCircle className="w-4 h-4 text-[#FF3B30]" />} label="الدين" value={`${selectedInvoice.debtAmount.toLocaleString('ar-SA')} ر.س`} className="text-[#FF3B30]" />
+              <InfoRow icon={<AlertCircle className="w-4 h-4 text-[#FF3B30]" />} label="الدين" value={selectedInvoice.debtAmount.toLocaleString('ar-SA')} className="text-[#FF3B30]" />
             )}
             {selectedInvoice.creditAmount > 0 && (
-              <InfoRow icon={<CreditCard className="w-4 h-4 text-[#007AFF]" />} label="إضافة للرصيد" value={`${selectedInvoice.creditAmount.toLocaleString('ar-SA')} ر.س`} className="text-[#007AFF]" />
+              <InfoRow icon={<CreditCard className="w-4 h-4 text-[#007AFF]" />} label="إضافة للرصيد" value={selectedInvoice.creditAmount.toLocaleString('ar-SA')} className="text-[#007AFF]" />
             )}
           </div>
         </div>
@@ -722,7 +723,7 @@ export function AdminInvoices() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-gray-500">الدين المستحق</span>
-                  <span className="text-xs font-bold text-[#FF3B30]">{formatCurrency(receiptDialog.debtAmount)} ر.س</span>
+                  <span className="text-xs font-bold text-[#FF3B30] flex items-center gap-0.5">{formatCurrency(receiptDialog.debtAmount)} <SarIcon size={12} className="text-[#FF3B30]" /></span>
                 </div>
               </div>
 
@@ -804,7 +805,7 @@ export function AdminInvoices() {
   );
 }
 
-function InfoRow({ icon, label, value, bold, className }: { icon: React.ReactNode; label: string; value: string; bold?: boolean; className?: string }) {
+function InfoRow({ icon, label, value, bold, className }: { icon: React.ReactNode; label: string; value: React.ReactNode; bold?: boolean; className?: string }) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">

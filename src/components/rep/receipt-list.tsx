@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { CheckCircle, Clock, Receipt, Banknote, ArrowLeftRight, FileCheck, Wallet, Hash } from 'lucide-react';
+import { SarIcon } from '@/components/shared/sar-icon';
 
 interface ReceiptItem {
   id: string;
@@ -234,7 +235,7 @@ export function ReceiptList({ clientId }: { clientId: string }) {
                 <p className="text-sm font-bold text-[#34C759] number-mono">
                   +{receipt.amount.toLocaleString('ar-SA')}
                 </p>
-                <p className="text-[11px] text-gray-400">ر.س</p>
+                <p className="text-[11px] text-gray-400"><SarIcon size={10} /></p>
               </div>
             </motion.div>
           );

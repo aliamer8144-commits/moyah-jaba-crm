@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, Trophy } from 'lucide-react';
 import { Invoice, Client } from '@/lib/store';
+import { SarIcon } from '@/components/shared/sar-icon';
 
 interface BadgeDefinition {
   id: string;

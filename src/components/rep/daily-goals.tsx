@@ -25,6 +25,7 @@ import {
   Trophy,
   Flame,
 } from 'lucide-react';
+import { SarIcon } from '@/components/shared/sar-icon';
 
 interface GoalData {
   id: string;
@@ -247,7 +248,7 @@ export function DailyGoals({ onGoalSet }: DailyGoalsProps) {
                 <div>
                   <label className="text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5">
                     <DollarSign className="w-4 h-4 text-[#34C759]" />
-                    هدف الإيرادات (ر.س)
+                    هدف الإيرادات (<SarIcon className="inline" size={10} />)
                   </label>
                   <Input
                     type="number"
@@ -358,7 +359,7 @@ export function DailyGoals({ onGoalSet }: DailyGoalsProps) {
                   <div>
                     <label className="text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5">
                       <DollarSign className="w-4 h-4 text-[#34C759]" />
-                      هدف الإيرادات (ر.س)
+                      هدف الإيرادات (<SarIcon className="inline" size={10} />)
                     </label>
                     <Input
                       type="number"
