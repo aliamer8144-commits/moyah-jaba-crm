@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
     const invoices = await db.invoice.findMany({
       where: { repId },
-      include: { client: { select: { id: true, name: true } } },
+      include: { client: { select: { id: true, name: true, businessName: true } } },
       orderBy: { createdAt: "desc" },
     });
 

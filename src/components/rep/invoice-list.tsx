@@ -73,7 +73,7 @@ export function InvoiceList() {
   const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'paid' | 'debt' | 'synced' | 'unsynced'>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
-  const [syncTooltip, setSyncTooltip] = useState<{ text: string; x: number; y: number } | null>(null);
+  const [syncTooltipId, setSyncTooltipId] = useState<string | null>(null);
 
   const fetchInvoices = useCallback(async () => {
     if (!user) return;
@@ -97,18 +97,11 @@ export function InvoiceList() {
 
   // Auto-hide sync tooltip
   useEffect(() => {
-    if (syncTooltip) {
-      const timer = setTimeout(() => setSyncTooltip(null), 3000);
+    if (syncTooltipId) {
+      const timer = setTimeout(() => setSyncTooltipId(null), 3000);
       return () => clearTimeout(timer);
     }
-  }, [syncTooltip]);
-
-  // Hide tooltip on scroll
-  useEffect(() => {
-    const handleScroll = () => setSyncTooltip(null);
-    window.addEventListener('scroll', handleScroll, true);
-    return () => window.removeEventListener('scroll', handleScroll, true);
-  }, []);
+  }, [syncTooltipId]);
 
   const now = new Date();
 
@@ -194,11 +187,7 @@ export function InvoiceList() {
 
   const handleSyncClick = (e: React.MouseEvent, inv: Invoice) => {
     e.stopPropagation();
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    const text = inv.synced
-      ? 'تمت مزامنة هذه الفاتورة بنجاح ✓'
-      : 'سيتم مزامنة هذه الفاتورة تلقائياً عند الاتصال بالإنترنت';
-    setSyncTooltip({ text, x: rect.left + rect.width / 2, y: rect.top });
+    setSyncTooltipId(syncTooltipId === inv.id ? null : inv.id);
   };
 
   return (
@@ -237,28 +226,6 @@ export function InvoiceList() {
           </Button>
         </div>
       </motion.div>
-
-      {/* Sync Tooltip - positioned near the clicked button */}
-      <AnimatePresence>
-        {syncTooltip && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="fixed z-[100] pointer-events-none"
-            style={{
-              left: syncTooltip.x,
-              top: syncTooltip.y - 8,
-              transform: 'translate(-50%, -100%)',
-            }}
-          >
-            <div className="bg-[#1c1c1e] dark:bg-gray-700 text-white text-xs font-medium px-3.5 py-2 rounded-xl shadow-lg whitespace-nowrap">
-              {syncTooltip.text}
-              <div className="absolute left-1/2 -translate-x-1/2 -bottom-1.5 w-3 h-3 bg-[#1c1c1e] dark:bg-gray-700 rotate-45 rounded-sm" />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Filter Panel */}
       <AnimatePresence>
@@ -440,6 +407,7 @@ export function InvoiceList() {
                     <Clock className="w-3 h-3" />
                     {formatDate(inv.createdAt)}
                   </span>
+                  <div className="relative">
                   <motion.button
                     whileTap={{ scale: 0.85 }}
                     onClick={(e) => handleSyncClick(e, inv)}
@@ -452,6 +420,24 @@ export function InvoiceList() {
                       <XCircle className="w-4.5 h-4.5 text-[#FF3B30]" />
                     )}
                   </motion.button>
+                  <AnimatePresence>
+                    {syncTooltipId === inv.id && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.85, y: 4 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.85, y: 4 }}
+                        className="absolute top-full mt-1.5 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+                      >
+                        <div className="bg-[#1c1c1e] dark:bg-gray-700 text-white text-[11px] font-medium px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
+                          {inv.synced
+                            ? 'تمت مزامنة هذه الفاتورة بنجاح ✓'
+                            : 'سيتم مزامنة هذه الفاتورة تلقائياً عند الاتصال بالإنترنت'}
+                          <div className="absolute left-1/2 -translate-x-1/2 -top-1.5 w-2.5 h-2.5 bg-[#1c1c1e] dark:bg-gray-700 rotate-45 rounded-sm" />
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  </div>
                 </div>
 
                 {/* Client Info: Name aligned with avatar top, business name below */}
