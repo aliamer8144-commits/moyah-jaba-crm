@@ -25,6 +25,11 @@ export function PrintInvoice({ invoice, repName }: PrintInvoiceProps) {
   const hasDiscount = invoice.discountType !== 'none' && invoice.discountValue > 0;
   const hasPromotion = invoice.promotionQty > 0;
 
+  // Calculate discount percentage for display (discountValue is the actual amount, not the raw percentage)
+  const discountPercent = invoice.total > 0
+    ? Math.round((invoice.discountValue / invoice.total) * 100)
+    : 0;
+
   return (
     <div className="print-invoice" dir="rtl">
       {/* Header */}
@@ -73,7 +78,7 @@ export function PrintInvoice({ invoice, repName }: PrintInvoiceProps) {
         <tbody>
           <tr>
             <td>مياه جبأ</td>
-            <td>{invoice.quantity} كرتون</td>
+            <td>{invoice.quantity}</td>
             <td>{formatCurrency(invoice.price)} ر.س</td>
           </tr>
         </tbody>
@@ -98,7 +103,7 @@ export function PrintInvoice({ invoice, repName }: PrintInvoiceProps) {
       <div className="print-inv-totals">
         {hasDiscount && (
           <div className="print-inv-totals-row print-inv-discount">
-            <span>الخصم {invoice.discountType === 'percentage' ? `(${invoice.discountValue}%)` : ''}</span>
+            <span>الخصم {invoice.discountType === 'percentage' ? `(${discountPercent}%)` : ''}</span>
             <span>-{formatCurrency(invoice.discountValue)} ر.س</span>
           </div>
         )}

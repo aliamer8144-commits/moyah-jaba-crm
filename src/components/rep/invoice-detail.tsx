@@ -17,7 +17,6 @@ import {
   Calendar,
   Hash,
   Receipt,
-  Percent,
   Gift,
   CreditCard,
   AlertCircle,
@@ -28,6 +27,8 @@ import {
   Printer,
   Banknote,
   RefreshCw,
+  Tag,
+  User,
 } from 'lucide-react';
 
 const fadeUp = {
@@ -62,7 +63,6 @@ export function InvoiceDetail({
     setRequestEntityType,
     setRequestActionType,
     setRequestEntityId,
-    setRepTab,
     setInvoices,
   } = useAppStore();
 
@@ -75,6 +75,11 @@ export function InvoiceDetail({
 
   const hasDiscount = invoice.discountType !== 'none' && invoice.discountValue > 0;
   const hasPromotion = invoice.promotionQty > 0;
+
+  // Calculate discount percentage for display (discountValue is the actual amount, not the raw percentage)
+  const discountPercent = invoice.total > 0
+    ? Math.round((invoice.discountValue / invoice.total) * 100)
+    : 0;
 
   const handleEditRequest = () => {
     setRequestEntityType('invoice');
@@ -91,7 +96,7 @@ export function InvoiceDetail({
   };
 
   const handleShare = async () => {
-    const text = `فاتورة مياه جبأ\nالعميل: ${invoice.client?.name || 'عميل'}\nالمبلغ: ${invoice.finalTotal.toLocaleString('ar-SA')} ر.س\nالتاريخ: ${formatDate(invoice.createdAt)}`;
+    const text = `فاتورة مياه جبأ\nالعميل: ${invoice.client?.name || 'عميل'}\nالمبلغ: ${formatCurrency(invoice.finalTotal)} ر.س\nالتاريخ: ${formatDate(invoice.createdAt)}`;
     if (navigator.share) {
       try {
         await navigator.share({ title: 'فاتورة مياه جبأ', text });
@@ -179,152 +184,197 @@ export function InvoiceDetail({
         transition={{ duration: 0.4, ease: 'easeOut' }}
         className="mx-4 bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden"
       >
-        {/* Invoice Header */}
-        <div className="bg-gradient-to-l from-[#007AFF] to-[#0055D4] p-4 text-white">
+        {/* Invoice Header - Brand */}
+        <div className="bg-gradient-to-l from-[#007AFF] to-[#0055D4] px-5 py-4 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <Droplets className="w-5 h-5" />
+              <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                <Droplets className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-bold text-sm">مياه جبأ</h3>
+                <h3 className="font-extrabold text-base tracking-wide">مياه جبأ</h3>
+                <p className="text-[11px] text-white/70 mt-0.5">فاتورة بيع</p>
               </div>
             </div>
-            <div className="flex items-center gap-1.5 bg-white/15 backdrop-blur-sm px-2.5 py-1 rounded-lg text-[11px]">
-              <Hash className="w-3 h-3" />
-              <span>{invoice.id.slice(-6).toUpperCase()}</span>
+            <div className="text-left">
+              <div className="flex items-center gap-1.5 bg-white/15 backdrop-blur-sm px-3 py-1.5 rounded-lg text-xs">
+                <Hash className="w-3.5 h-3.5" />
+                <span className="font-mono font-bold">{invoice.id.slice(-6).toUpperCase()}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="p-4 space-y-4">
-          {/* Meta Info Row: Date, Client, Business, Paid */}
-          <div className="space-y-2">
-            {/* Date & Time */}
-            <div className="flex items-center gap-1.5 text-[11px] text-gray-400">
-              <Calendar className="w-3 h-3" />
-              {formatDate(invoice.createdAt)}
-            </div>
-
-            {/* Client Name */}
-            <p className="text-sm font-bold text-gray-900 dark:text-white">
-              {invoice.client?.name || 'عميل'}
-            </p>
-
-            {/* Business Name */}
-            {invoice.client?.businessName && (
-              <p className="text-xs text-gray-500">{invoice.client.businessName}</p>
-            )}
-
-            {/* Paid Amount */}
-            <div className="flex items-center gap-1.5 text-[11px]">
-              <CreditCard className="w-3 h-3 text-[#34C759]" />
-              <span className="text-gray-500">المدفوع:</span>
-              <span className="font-semibold text-[#34C759]">{formatCurrency(invoice.paidAmount)} ر.س</span>
-            </div>
-
-            {invoice.debtAmount > 0 && (
-              <div className="flex items-center gap-1.5 text-[11px]">
-                <AlertCircle className="w-3 h-3 text-[#FF3B30]" />
-                <span className="text-[#FF3B30]">الدين:</span>
-                <span className="font-semibold text-[#FF3B30]">{formatCurrency(invoice.debtAmount)} ر.س</span>
-              </div>
-            )}
-
-            {invoice.creditAmount > 0 && (
-              <div className="flex items-center gap-1.5 text-[11px]">
-                <TrendingUp className="w-3 h-3 text-[#007AFF]" />
-                <span className="text-[#007AFF]">رصيد إضافي:</span>
-                <span className="font-semibold text-[#007AFF]">+{formatCurrency(invoice.creditAmount)} ر.س</span>
-              </div>
-            )}
+        {/* Client & Date Info */}
+        <div className="px-5 pt-4 pb-3 space-y-3">
+          {/* Date Row */}
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>{formatDate(invoice.createdAt)}</span>
           </div>
 
-          {/* Dashed Separator */}
-          <div className="border-t border-dashed border-gray-200 dark:border-gray-700" />
+          {/* Client Name */}
+          <div>
+            <p className="text-[10px] text-gray-400 font-medium mb-0.5">العميل</p>
+            <p className="text-base font-bold text-gray-900 dark:text-white leading-tight">
+              {invoice.client?.name || 'عميل'}
+            </p>
+            {invoice.client?.businessName && (
+              <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                <Tag className="w-3 h-3" />
+                {invoice.client.businessName}
+              </p>
+            )}
+          </div>
+        </div>
 
-          {/* Items Table */}
+        {/* Separator */}
+        <div className="mx-5 border-t border-gray-100 dark:border-gray-800" />
+
+        {/* Items Table */}
+        <div className="mx-5 my-3">
           <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
             {/* Table Header */}
-            <div className="grid grid-cols-3 bg-gray-50 dark:bg-gray-800/80">
-              <div className="px-3 py-2 text-[11px] font-semibold text-gray-500 dark:text-gray-400 text-center border-l border-gray-200 dark:border-gray-700">المنتج</div>
-              <div className="px-3 py-2 text-[11px] font-semibold text-gray-500 dark:text-gray-400 text-center border-l border-gray-200 dark:border-gray-700">الكمية</div>
-              <div className="px-3 py-2 text-[11px] font-semibold text-gray-500 dark:text-gray-400 text-center">السعر</div>
+            <div className="grid grid-cols-[1fr_auto_auto] bg-gray-50 dark:bg-gray-800/80 text-[11px] font-semibold text-gray-500 dark:text-gray-400">
+              <div className="px-3 py-2.5 text-center">المنتج</div>
+              <div className="px-4 py-2.5 text-center border-r border-gray-200 dark:border-gray-700">الكمية</div>
+              <div className="px-4 py-2.5 text-center border-r border-gray-200 dark:border-gray-700">السعر</div>
             </div>
             {/* Data Row */}
-            <div className="grid grid-cols-3">
-              <div className="px-3 py-2.5 flex items-center justify-center gap-1.5 border-l border-gray-100 dark:border-gray-800">
-                <Droplets className="w-3.5 h-3.5 text-[#007AFF] shrink-0" />
+            <div className="grid grid-cols-[1fr_auto_auto]">
+              <div className="px-3 py-3 flex items-center justify-center gap-2 border-b border-gray-50 dark:border-gray-800">
+                <Droplets className="w-4 h-4 text-[#007AFF] shrink-0" />
                 <span className="text-sm font-medium text-gray-800 dark:text-white">مياه جبأ</span>
               </div>
-              <div className="px-3 py-2.5 flex items-center justify-center text-sm text-gray-800 dark:text-white border-l border-gray-100 dark:border-gray-800">
-                {invoice.quantity} كرتون
+              <div className="px-4 py-3 flex items-center justify-center text-sm font-semibold text-gray-800 dark:text-white border-b border-gray-50 dark:border-gray-800 border-r border-gray-100 dark:border-gray-800">
+                {invoice.quantity}
               </div>
-              <div className="px-3 py-2.5 flex items-center justify-center text-sm text-gray-800 dark:text-white">
-                {formatCurrency(invoice.price)} ر.س
+              <div className="px-4 py-3 flex items-center justify-center text-sm text-gray-800 dark:text-white border-b border-gray-50 dark:border-gray-800 border-r border-gray-100 dark:border-gray-800">
+                {formatCurrency(invoice.price)} <span className="text-[10px] text-gray-400 mr-0.5">ر.س</span>
               </div>
             </div>
             {/* Promotion Row */}
             {hasPromotion && (
-              <div className="grid grid-cols-3 bg-[#FF9500]/5">
-                <div className="col-span-2 px-3 py-2 flex items-center gap-1.5 text-[11px] text-[#FF9500] border-l border-gray-100 dark:border-gray-800">
-                  <Gift className="w-3 h-3" />
-                  دعاية ({invoice.promotionQty} كرتون مجاني)
+              <div className="grid grid-cols-[1fr_auto] bg-amber-50/50 dark:bg-amber-900/10">
+                <div className="px-3 py-2 flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400 border-r border-gray-100 dark:border-gray-800">
+                  <Gift className="w-3.5 h-3.5" />
+                  <span>دعاية ({invoice.promotionQty} كرتون مجاني)</span>
                 </div>
-                <div className="px-3 py-2 flex items-center justify-center text-[11px] text-[#FF9500] font-medium">
+                <div className="px-4 py-2 flex items-center justify-center text-xs text-amber-600 dark:text-amber-400 font-bold">
                   مجاني
                 </div>
               </div>
             )}
             {/* Total Row */}
-            <div className="grid grid-cols-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50/60 dark:bg-gray-800/30">
-              <div className="col-span-2 px-3 py-2.5 text-sm text-gray-600 dark:text-gray-400 flex items-center justify-end font-medium">
+            <div className="grid grid-cols-[1fr_auto] bg-gray-50/80 dark:bg-gray-800/40 border-t border-gray-200 dark:border-gray-700">
+              <div className="px-3 py-3 flex items-center justify-end text-sm font-semibold text-gray-600 dark:text-gray-300 border-r border-gray-100 dark:border-gray-800">
                 المجموع
               </div>
-              <div className="px-3 py-2.5 text-sm font-bold text-gray-900 dark:text-white text-center">
-                {formatCurrency(invoice.total)} <span className="text-[11px] font-normal text-gray-400">ر.س</span>
+              <div className="px-4 py-3 flex items-center justify-center text-sm font-bold text-gray-900 dark:text-white">
+                {formatCurrency(invoice.total)} <span className="text-[10px] font-normal text-gray-400 mr-0.5">ر.س</span>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Dashed Separator */}
-          <div className="border-t border-dashed border-gray-200 dark:border-gray-700" />
+        {/* Separator */}
+        <div className="mx-5 border-t border-gray-100 dark:border-gray-800" />
 
-          {/* Discount & Final Total */}
-          <div className="space-y-2">
-            {hasDiscount && (
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5">
-                  <Percent className="w-3.5 h-3.5 text-[#FF3B30]" />
-                  <span className="text-sm text-[#FF3B30]">
-                    الخصم {invoice.discountType === 'percentage' ? `(${invoice.discountValue}%)` : ''}
-                  </span>
+        {/* Discount & Final Total */}
+        <div className="mx-5 my-3 space-y-2.5">
+          {/* Pre-discount total with strikethrough if discount exists */}
+          {hasDiscount && (
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-gray-400">المجموع قبل الخصم</span>
+              <span className="text-sm text-gray-400 line-through">
+                {formatCurrency(invoice.total)} ر.س
+              </span>
+            </div>
+          )}
+
+          {/* Discount Row */}
+          {hasDiscount && (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <div className="w-5 h-5 rounded-md bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
+                  <Tag className="w-3 h-3 text-red-500" />
                 </div>
-                <span className="text-sm font-semibold text-[#FF3B30]">
-                  -{formatCurrency(invoice.discountValue)} ر.س
+                <span className="text-sm text-red-500 font-medium">
+                  الخصم
+                  {invoice.discountType === 'percentage' && (
+                    <span className="text-xs mr-1">({discountPercent}%)</span>
+                  )}
                 </span>
               </div>
-            )}
-            <div className="flex items-center justify-between bg-[#007AFF]/5 rounded-xl p-3">
+              <span className="text-sm font-bold text-red-500">
+                -{formatCurrency(invoice.discountValue)} ر.س
+              </span>
+            </div>
+          )}
+
+          {/* Final Total */}
+          <div className="bg-gradient-to-l from-[#007AFF]/8 to-[#0055D4]/5 dark:from-[#007AFF]/15 dark:to-[#0055D4]/10 rounded-xl p-3.5">
+            <div className="flex items-center justify-between">
               <span className="text-sm font-bold text-gray-900 dark:text-white">الإجمالي النهائي</span>
-              <span className="text-lg font-extrabold text-gray-900 dark:text-white">
+              <span className="text-xl font-extrabold text-gray-900 dark:text-white">
                 {formatCurrency(invoice.finalTotal)} <span className="text-xs font-normal text-gray-400">ر.س</span>
               </span>
             </div>
           </div>
+        </div>
 
-          {/* Dashed Separator */}
-          <div className="border-t border-dashed border-gray-200 dark:border-gray-700" />
+        {/* Separator */}
+        <div className="mx-5 border-t border-gray-100 dark:border-gray-800" />
 
-          {/* Footer: Rep Name & Notes */}
-          <div className="space-y-1.5">
-            {user && (
-              <div className="flex items-center gap-1.5 text-[11px] text-gray-400">
-                <span className="font-medium">المندوب:</span>
-                <span>{user.name}</span>
-              </div>
-            )}
+        {/* Payment Info */}
+        <div className="mx-5 my-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <CreditCard className="w-3.5 h-3.5 text-emerald-500" />
+              <span className="text-xs text-gray-400">المدفوع</span>
+            </div>
+            <span className="text-sm font-bold text-emerald-500">
+              {formatCurrency(invoice.paidAmount)} ر.س
+            </span>
           </div>
+
+          {invoice.debtAmount > 0 && (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <AlertCircle className="w-3.5 h-3.5 text-red-500" />
+                <span className="text-xs text-gray-400">المبلغ المدين</span>
+              </div>
+              <span className="text-sm font-bold text-red-500">
+                {formatCurrency(invoice.debtAmount)} ر.س
+              </span>
+            </div>
+          )}
+
+          {invoice.creditAmount > 0 && (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <TrendingUp className="w-3.5 h-3.5 text-blue-500" />
+                <span className="text-xs text-gray-400">رصيد إضافي</span>
+              </div>
+              <span className="text-sm font-bold text-blue-500">
+                +{formatCurrency(invoice.creditAmount)} ر.س
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Separator */}
+        <div className="mx-5 border-t border-gray-100 dark:border-gray-800" />
+
+        {/* Footer: Rep Name */}
+        <div className="mx-5 py-3">
+          {user && (
+            <div className="flex items-center gap-1.5 text-xs text-gray-400">
+              <User className="w-3.5 h-3.5" />
+              <span className="font-medium">المندوب:</span>
+              <span>{user.name}</span>
+            </div>
+          )}
         </div>
       </motion.div>
 
@@ -426,12 +476,12 @@ export function InvoiceDetail({
               <p className="text-sm font-semibold text-gray-900 dark:text-white">{invoice.client?.name || 'غير معروف'}</p>
             </div>
 
-            <div className="bg-[#FF3B30]/5 rounded-xl p-3 border border-[#FF3B30]/10">
-              <Label className="text-xs text-[#FF3B30] mb-1 block flex items-center gap-1">
+            <div className="bg-red-50 dark:bg-red-900/10 rounded-xl p-3 border border-red-100 dark:border-red-900/30">
+              <Label className="text-xs text-red-500 mb-1 block flex items-center gap-1">
                 <AlertCircle className="w-3 h-3" />
                 المبلغ المدين المستحق
               </Label>
-              <p className="text-lg font-bold text-[#FF3B30]">{invoice.debtAmount.toLocaleString('ar-SA')} ر.س</p>
+              <p className="text-lg font-bold text-red-500">{formatCurrency(invoice.debtAmount)} ر.س</p>
             </div>
 
             <div>
@@ -467,7 +517,7 @@ export function InvoiceDetail({
                     onClick={() => setPaymentMethod(method.value)}
                     className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all duration-200 ${
                       paymentMethod === method.value
-                        ? 'border-[#34C759] bg-[#34C759]/5 text-[#34C759]'
+                        ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/10 text-emerald-600 dark:text-emerald-400'
                         : 'border-gray-200 dark:border-gray-700 text-gray-500 hover:border-gray-300'
                     }`}
                   >
