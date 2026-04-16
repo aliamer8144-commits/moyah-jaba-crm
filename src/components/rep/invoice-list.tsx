@@ -506,9 +506,9 @@ export function InvoiceList() {
                       </span>
                     )}
                   </div>
-                  <p className="text-base font-extrabold text-[#1c1c1e] dark:text-white shrink-0">
-                    {formatCurrency(inv.finalTotal)} <SarIcon className="text-gray-400" size={10} />
-                  </p>
+                  <span className="inline-flex items-center gap-1 text-base font-extrabold text-[#1c1c1e] dark:text-white shrink-0">
+                    {formatCurrency(inv.finalTotal)} <SarIcon size={14} />
+                  </span>
                 </div>
               </motion.div>
             ))}
