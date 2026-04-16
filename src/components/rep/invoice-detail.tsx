@@ -129,6 +129,7 @@ export function InvoiceDetail({
     if (scrollTop <= 0) {
       pullStartY.current = e.touches[0].clientY;
       setIsPulling(true);
+      e.stopPropagation();
     }
   };
 
@@ -136,9 +137,10 @@ export function InvoiceDetail({
     if (!isPulling || isRefreshing) return;
     const diff = Math.max(0, e.touches[0].clientY - pullStartY.current);
     setPullDistance(Math.min(diff * 0.4, 100));
+    e.stopPropagation();
   };
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = (e: React.TouchEvent) => {
     if (!isPulling) return;
     setIsPulling(false);
     if (pullDistance >= PULL_THRESHOLD) {
@@ -147,6 +149,7 @@ export function InvoiceDetail({
     } else {
       setPullDistance(0);
     }
+    e.stopPropagation();
   };
 
   const pullProgress = Math.min(pullDistance / PULL_THRESHOLD, 1);
