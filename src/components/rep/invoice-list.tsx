@@ -154,11 +154,25 @@ export function InvoiceList() {
 
   const hasActiveFilters = dateFilter !== 'all' || statusFilter !== 'all' || sortBy !== 'newest';
 
+  const refreshInvoice = useCallback(async () => {
+    if (!selectedInvoice) return;
+    try {
+      const res = await fetch(`/api/invoices?invoiceId=${selectedInvoice.id}`);
+      if (res.ok) {
+        const updatedInv = await res.json();
+        setSelectedInvoice({ ...selectedInvoice, ...updatedInv });
+      }
+    } catch {
+      // silent
+    }
+  }, [selectedInvoice]);
+
   if (selectedInvoice) {
     return (
       <InvoiceDetail
         invoice={selectedInvoice}
         onBack={() => setSelectedInvoice(null)}
+        onRefresh={refreshInvoice}
       />
     );
   }

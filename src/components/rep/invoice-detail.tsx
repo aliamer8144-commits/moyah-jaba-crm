@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore, Invoice } from '@/lib/store';
 import { Button } from '@/components/ui/button';
@@ -59,10 +59,19 @@ function formatCurrency(n: number) {
 export function InvoiceDetail({
   invoice,
   onBack,
+  onRefresh,
 }: {
   invoice: Invoice;
   onBack: () => void;
+  onRefresh?: () => void;
 }) {
+  // Pull to refresh
+  const [pullDistance, setPullDistance] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isPulling, setIsPulling] = useState(false);
+  const pullStartY = useRef(0);
+  const pullContainerRef = useRef<HTMLDivElement>(null);
+  const PULL_THRESHOLD = 70;
   const {
     user,
     setRequestDialogOpen,
@@ -104,6 +113,43 @@ export function InvoiceDetail({
   const handlePrint = () => {
     window.print();
   };
+
+  const handlePullRefresh = useCallback(async () => {
+    if (onRefresh) {
+      await onRefresh();
+    }
+    setTimeout(() => {
+      setIsRefreshing(false);
+      setPullDistance(0);
+    }, 800);
+  }, [onRefresh]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const scrollTop = pullContainerRef.current?.scrollTop || 0;
+    if (scrollTop <= 0) {
+      pullStartY.current = e.touches[0].clientY;
+      setIsPulling(true);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isPulling || isRefreshing) return;
+    const diff = Math.max(0, e.touches[0].clientY - pullStartY.current);
+    setPullDistance(Math.min(diff * 0.4, 100));
+  };
+
+  const handleTouchEnd = () => {
+    if (!isPulling) return;
+    setIsPulling(false);
+    if (pullDistance >= PULL_THRESHOLD) {
+      setIsRefreshing(true);
+      handlePullRefresh();
+    } else {
+      setPullDistance(0);
+    }
+  };
+
+  const pullProgress = Math.min(pullDistance / PULL_THRESHOLD, 1);
 
   const handleOpenPaymentDialog = () => {
     setPaymentAmount(String(invoice.debtAmount));
@@ -159,7 +205,39 @@ export function InvoiceDetail({
   };
 
   return (
-    <motion.div initial="initial" animate="animate" variants={fadeUp} className="space-y-4">
+    <div
+      ref={pullContainerRef}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className="relative overflow-hidden"
+    >
+      {/* Pull indicator */}
+      <div className="overflow-hidden">
+        <motion.div
+          className="flex justify-center items-center"
+          style={{ height: pullDistance }}
+        >
+          {isRefreshing ? (
+            <div className="w-7 h-7 rounded-full bg-[#007AFF]/10 flex items-center justify-center">
+              <RefreshCw className="w-3.5 h-3.5 text-[#007AFF] animate-spin" />
+            </div>
+          ) : (
+            <div
+              className="w-7 h-7 rounded-full bg-[#007AFF]/10 flex items-center justify-center"
+              style={{ opacity: pullProgress, transform: `scale(${0.5 + pullProgress * 0.5})` }}
+            >
+              <RefreshCw className="w-3.5 h-3.5 text-[#007AFF]" style={{ transform: `rotate(${180 * pullProgress}deg)` }} />
+            </div>
+          )}
+        </motion.div>
+      </div>
+
+    <motion.div
+      animate={{ y: isRefreshing ? PULL_THRESHOLD : 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+    >
+      <motion.div initial="initial" animate="animate" variants={fadeUp} className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-2">
         <div className="flex items-center gap-3">
@@ -428,6 +506,8 @@ export function InvoiceDetail({
 
       {/* Bottom spacer */}
       <div className="pb-4" />
+      </motion.div>
+      </motion.div>
 
       {/* Payment Dialog */}
       <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
@@ -541,6 +621,6 @@ export function InvoiceDetail({
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </motion.div>
+    </div>
   );
 }
