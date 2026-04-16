@@ -28,7 +28,6 @@ import {
   ChevronDown,
   ChevronUp,
   Gift,
-  Wallet,
   AlertCircle,
   CheckCircle2,
   Truck,
@@ -270,7 +269,7 @@ export function InvoiceForm() {
       {/* Invoice Document */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden">
         {/* Invoice Header */}
-        <div className="bg-gradient-to-l from-[#007AFF] to-[#5856D6] p-4 text-white">
+        <div className="bg-gradient-to-l from-[#007AFF] to-[#0055D4] p-4 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
@@ -295,7 +294,7 @@ export function InvoiceForm() {
             {selectedClient ? (
               <div className="flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 rounded-xl p-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#007AFF] to-[#5856D6] flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#007AFF] to-[#0055D4] flex items-center justify-center">
                     <span className="text-white text-xs font-bold">{selectedClient.name.charAt(0)}</span>
                   </div>
                   <div>
@@ -338,7 +337,7 @@ export function InvoiceForm() {
                               onClick={() => { setSelectedClientId(c.id); setClientSearch(''); setShowClientDropdown(false); }}
                               className="w-full flex items-center gap-2.5 px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm transition-colors"
                             >
-                              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#007AFF] to-[#5856D6] flex items-center justify-center shrink-0">
+                              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#007AFF] to-[#0055D4] flex items-center justify-center shrink-0">
                                 <span className="text-white text-[10px] font-bold">{c.name.charAt(0)}</span>
                               </div>
                               <div className="text-right min-w-0">
@@ -397,7 +396,7 @@ export function InvoiceForm() {
                       onClick={() => handleProductSelect(product)}
                       className={`flex-shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium border transition-all ${
                         isSelected
-                          ? 'bg-[#007AFF] text-white border-[#007AFF] shadow-sm shadow-[#007AFF]/25'
+                          ? 'bg-[#007AFF] text-white border-[#007AFF] shadow-sm shadow-[#007AFF]/20'
                           : 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-gray-300'
                       }`}
                     >
@@ -453,7 +452,15 @@ export function InvoiceForm() {
               onClick={() => setShowDiscount(!showDiscount)}
               className="flex items-center justify-between w-full py-1"
             >
-              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">الخصم</span>
+              <span className="flex items-center gap-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                الخصم
+                {discountType === 'percentage' && discountValue && !showDiscount && (
+                  <span className="normal-case font-bold text-[#007AFF] text-[11px]">{discountValue}%</span>
+                )}
+                {discountType === 'fixed' && discountValue && !showDiscount && (
+                  <span className="normal-case font-bold text-[#007AFF] text-[11px]">{Number(discountValue).toLocaleString('ar-SA')} ر.س</span>
+                )}
+              </span>
               {showDiscount ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
             </button>
             <AnimatePresence>
@@ -538,7 +545,14 @@ export function InvoiceForm() {
 
           {/* Payment Section */}
           <div>
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">الدفع</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">الدفع</p>
+              {finalTotal > 0 && (
+                <p className="text-sm font-extrabold text-gray-900 dark:text-white">
+                  {finalTotal.toLocaleString('ar-SA')} <span className="text-xs font-normal text-gray-400">ر.س</span>
+                </p>
+              )}
+            </div>
             <div>
               <label className="text-[11px] text-gray-500 mb-1 block">المبلغ المدفوع (ر.س)</label>
               <Input
@@ -574,26 +588,6 @@ export function InvoiceForm() {
 
           {/* Dashed Separator */}
           <div className="border-t border-dashed border-gray-200 dark:border-gray-700" />
-
-          {/* Total Section */}
-          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#34C759] to-[#30D158] flex items-center justify-center">
-                  <Wallet className="w-4 h-4 text-white" />
-                </div>
-                <div>
-                  <p className="text-[11px] text-gray-500">الإجمالي النهائي</p>
-                  {discountAmount > 0 && (
-                    <p className="text-[10px] text-[#FF3B30] line-through">{total.toLocaleString('ar-SA')} ر.س</p>
-                  )}
-                </div>
-              </div>
-              <p className="text-xl font-extrabold text-gray-900 dark:text-white">
-                {finalTotal.toLocaleString('ar-SA')} <span className="text-xs font-normal text-gray-400">ر.س</span>
-              </p>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -602,7 +596,7 @@ export function InvoiceForm() {
         id="invoice-submit-btn"
         onClick={() => handleSubmit(true)}
         disabled={loading || !selectedClientId || qty <= 0 || prc <= 0}
-        className="w-full h-12 rounded-2xl bg-gradient-to-l from-[#007AFF] to-[#5856D6] text-white font-bold text-sm shadow-lg shadow-[#007AFF]/25 disabled:opacity-40 disabled:shadow-none transition-opacity flex items-center justify-center gap-2"
+        className="w-full h-12 rounded-2xl bg-gradient-to-l from-[#007AFF] to-[#0055D4] text-white font-bold text-sm shadow-lg shadow-[#007AFF]/25 disabled:opacity-40 disabled:shadow-none transition-opacity flex items-center justify-center gap-2"
       >
         {loading ? (
           <Loader2 className="w-5 h-5 animate-spin" />
@@ -630,7 +624,7 @@ export function InvoiceForm() {
             </div>
             <button
               onClick={() => document.getElementById('invoice-submit-btn')?.click()}
-              className="px-5 py-2.5 bg-gradient-to-l from-[#007AFF] to-[#5856D6] text-white rounded-xl text-sm font-semibold shadow-md shadow-[#007AFF]/25 flex items-center gap-1.5"
+              className="px-5 py-2.5 bg-gradient-to-l from-[#007AFF] to-[#0055D4] text-white rounded-xl text-sm font-semibold shadow-md shadow-[#007AFF]/25 flex items-center gap-1.5"
             >
               <Truck className="w-4 h-4" />
               إنشاء
