@@ -281,87 +281,92 @@ export function InvoiceDetail({
         <div className="mx-5 border-t border-gray-100 dark:border-gray-800" />
 
         {/* Discount & Final Total */}
-        <div className="mx-5 my-3 space-y-2.5">
-          {/* Pre-discount total with strikethrough if discount exists */}
+        <div className="mx-5 my-3 space-y-2">
           {hasDiscount && (
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-400">المجموع قبل الخصم</span>
-              <span className="text-sm text-gray-400 line-through">
-                {formatCurrency(invoice.total)} ر.س
-              </span>
-            </div>
-          )}
-
-          {/* Discount Row */}
-          {hasDiscount && (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <div className="w-5 h-5 rounded-md bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
-                  <Tag className="w-3 h-3 text-red-500" />
+            <>
+              {/* Discount Row */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-5 h-5 rounded-md bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
+                    <Tag className="w-3 h-3 text-red-500" />
+                  </div>
+                  <span className="text-sm text-red-500 font-medium">
+                    الخصم
+                    {invoice.discountType === 'percentage' && (
+                      <span className="text-xs mr-1">({discountPercent}%)</span>
+                    )}
+                  </span>
                 </div>
-                <span className="text-sm text-red-500 font-medium">
-                  الخصم
-                  {invoice.discountType === 'percentage' && (
-                    <span className="text-xs mr-1">({discountPercent}%)</span>
-                  )}
+                <span className="text-sm font-bold text-red-500">
+                  -{formatCurrency(invoice.discountValue)} ر.س
                 </span>
               </div>
-              <span className="text-sm font-bold text-red-500">
-                -{formatCurrency(invoice.discountValue)} ر.س
+              {/* Final Total - same size as discount, no separators */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">الإجمالي النهائي</span>
+                <span className="text-sm font-bold text-gray-900 dark:text-white">
+                  {formatCurrency(invoice.finalTotal)} ر.س
+                </span>
+              </div>
+            </>
+          )}
+
+          {!hasDiscount && (
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-gray-900 dark:text-white">الإجمالي النهائي</span>
+              <span className="text-sm font-bold text-gray-900 dark:text-white">
+                {formatCurrency(invoice.finalTotal)} ر.س
               </span>
             </div>
           )}
-
-          {/* Final Total */}
-          <div className="bg-gradient-to-l from-[#007AFF]/8 to-[#0055D4]/5 dark:from-[#007AFF]/15 dark:to-[#0055D4]/10 rounded-xl p-3.5">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-bold text-gray-900 dark:text-white">الإجمالي النهائي</span>
-              <span className="text-xl font-extrabold text-gray-900 dark:text-white">
-                {formatCurrency(invoice.finalTotal)} <span className="text-xs font-normal text-gray-400">ر.س</span>
-              </span>
-            </div>
-          </div>
         </div>
 
         {/* Separator */}
         <div className="mx-5 border-t border-gray-100 dark:border-gray-800" />
 
-        {/* Payment Info */}
-        <div className="mx-5 my-3 space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <CreditCard className="w-3.5 h-3.5 text-emerald-500" />
-              <span className="text-xs text-gray-400">المدفوع</span>
+        {/* Paid Amount - Prominent */}
+        <div className="mx-5 my-3">
+          <div className="bg-gradient-to-l from-emerald-500/10 to-emerald-600/5 dark:from-emerald-500/15 dark:to-emerald-600/10 rounded-xl p-3.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <CreditCard className="w-4 h-4 text-emerald-500" />
+                <span className="text-sm font-bold text-gray-900 dark:text-white">المدفوع</span>
+              </div>
+              <span className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">
+                {formatCurrency(invoice.paidAmount)} <span className="text-xs font-normal text-gray-400">ر.س</span>
+              </span>
             </div>
-            <span className="text-sm font-bold text-emerald-500">
-              {formatCurrency(invoice.paidAmount)} ر.س
-            </span>
           </div>
-
-          {invoice.debtAmount > 0 && (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <AlertCircle className="w-3.5 h-3.5 text-red-500" />
-                <span className="text-xs text-gray-400">المبلغ المدين</span>
-              </div>
-              <span className="text-sm font-bold text-red-500">
-                {formatCurrency(invoice.debtAmount)} ر.س
-              </span>
-            </div>
-          )}
-
-          {invoice.creditAmount > 0 && (
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <TrendingUp className="w-3.5 h-3.5 text-blue-500" />
-                <span className="text-xs text-gray-400">رصيد إضافي</span>
-              </div>
-              <span className="text-sm font-bold text-blue-500">
-                +{formatCurrency(invoice.creditAmount)} ر.س
-              </span>
-            </div>
-          )}
         </div>
+
+        {/* Debt / Credit */}
+        {(invoice.debtAmount > 0 || invoice.creditAmount > 0) && (
+          <div className="mx-5 space-y-2">
+            {invoice.debtAmount > 0 && (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5 text-red-500" />
+                  <span className="text-xs text-gray-400">المبلغ المدين</span>
+                </div>
+                <span className="text-sm font-bold text-red-500">
+                  {formatCurrency(invoice.debtAmount)} ر.س
+                </span>
+              </div>
+            )}
+
+            {invoice.creditAmount > 0 && (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <TrendingUp className="w-3.5 h-3.5 text-blue-500" />
+                  <span className="text-xs text-gray-400">رصيد إضافي</span>
+                </div>
+                <span className="text-sm font-bold text-blue-500">
+                  +{formatCurrency(invoice.creditAmount)} ر.س
+                </span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Separator */}
         <div className="mx-5 border-t border-gray-100 dark:border-gray-800" />
