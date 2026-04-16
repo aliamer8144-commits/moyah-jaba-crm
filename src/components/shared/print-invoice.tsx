@@ -86,7 +86,7 @@ export function PrintInvoice({ invoice, repName }: PrintInvoiceProps) {
         <tfoot>
           <tr>
             <td colSpan={2} className="print-inv-total-label">المجموع</td>
-            <td className="print-inv-total-value">{formatCurrency(invoice.total)} <SarIcon size={10} /></td>
+            <td className="print-inv-total-value">{formatCurrency(invoice.total)} <SarIcon size={11} /></td>
           </tr>
         </tfoot>
       </table>
@@ -105,33 +105,33 @@ export function PrintInvoice({ invoice, repName }: PrintInvoiceProps) {
         {hasDiscount && (
           <div className="print-inv-totals-row print-inv-discount">
             <span>الخصم {invoice.discountType === 'percentage' ? `(${discountPercent}%)` : ''}</span>
-            <span>-{formatCurrency(invoice.discountValue)} <SarIcon size={10} /></span>
+            <span>-{formatCurrency(invoice.discountValue)} <SarIcon size={11} /></span>
           </div>
         )}
 
         <div className="print-inv-totals-row">
           <span>الإجمالي النهائي</span>
-          <span>{formatCurrency(invoice.finalTotal)} <SarIcon size={10} /></span>
+          <span>{formatCurrency(invoice.finalTotal)} <SarIcon size={11} /></span>
         </div>
 
         <div className="print-inv-divider" />
 
         <div className="print-inv-totals-row print-inv-final">
           <span>المدفوع</span>
-          <span>{formatCurrency(invoice.paidAmount)} <SarIcon size={10} /></span>
+          <span>{formatCurrency(invoice.paidAmount)} <SarIcon size={13} /></span>
         </div>
 
         {invoice.debtAmount > 0 && (
           <div className="print-inv-totals-row print-inv-debt">
             <span>المبلغ المدين</span>
-            <span>{formatCurrency(invoice.debtAmount)} <SarIcon size={10} /></span>
+            <span>{formatCurrency(invoice.debtAmount)} <SarIcon size={11} /></span>
           </div>
         )}
 
         {invoice.creditAmount > 0 && (
           <div className="print-inv-totals-row print-inv-credit">
             <span>رصيد إضافي</span>
-            <span>+{formatCurrency(invoice.creditAmount)} <SarIcon size={10} /></span>
+            <span>+{formatCurrency(invoice.creditAmount)} <SarIcon size={11} /></span>
           </div>
         )}
       </div>

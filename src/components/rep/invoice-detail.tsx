@@ -369,7 +369,7 @@ export function InvoiceDetail({
                 {invoice.quantity}
               </div>
               <div className="px-4 py-3 flex items-center justify-center text-sm text-gray-800 dark:text-white border-b border-gray-50 dark:border-gray-800 border-r border-gray-100 dark:border-gray-800">
-                {formatCurrency(invoice.price)} <SarIcon className="text-gray-400 mr-0.5" size={10} />
+                <span className="inline-flex items-center gap-0.5">{formatCurrency(invoice.price)} <SarIcon className="text-gray-800 dark:text-white" size={12} /></span>
               </div>
             </div>
             {/* Promotion Row */}
@@ -390,7 +390,7 @@ export function InvoiceDetail({
                 المجموع
               </div>
               <div className="px-4 py-3 flex items-center justify-center text-sm font-bold text-gray-900 dark:text-white">
-                {formatCurrency(invoice.total)} <SarIcon className="text-gray-400 mr-0.5" size={10} />
+                <span className="inline-flex items-center gap-0.5">{formatCurrency(invoice.total)} <SarIcon className="text-gray-900 dark:text-white" size={12} /></span>
               </div>
             </div>
           </div>
@@ -417,14 +417,14 @@ export function InvoiceDetail({
                   </span>
                 </div>
                 <span className="text-sm font-bold text-red-500">
-                  -{formatCurrency(invoice.discountValue)} <SarIcon className="text-red-500 inline" />
+                  <span className="inline-flex items-center gap-0.5">-{formatCurrency(invoice.discountValue)} <SarIcon className="text-red-500" size={12} /></span>
                 </span>
               </div>
               {/* Final Total - same size as discount, no separators */}
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-gray-900 dark:text-white">الإجمالي النهائي</span>
-                <span className="text-sm font-bold text-gray-900 dark:text-white">
-                  {formatCurrency(invoice.finalTotal)} <SarIcon className="inline" />
+                <span className="inline-flex items-center gap-0.5 text-sm font-bold text-gray-900 dark:text-white">
+                  {formatCurrency(invoice.finalTotal)} <SarIcon className="text-gray-900 dark:text-white" size={12} />
                 </span>
               </div>
             </>
@@ -433,8 +433,8 @@ export function InvoiceDetail({
           {!hasDiscount && (
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-gray-900 dark:text-white">الإجمالي النهائي</span>
-              <span className="text-sm font-bold text-gray-900 dark:text-white">
-                {formatCurrency(invoice.finalTotal)} <SarIcon className="inline" />
+              <span className="inline-flex items-center gap-0.5 text-sm font-bold text-gray-900 dark:text-white">
+                {formatCurrency(invoice.finalTotal)} <SarIcon className="text-gray-900 dark:text-white" size={12} />
               </span>
             </div>
           )}
@@ -451,8 +451,8 @@ export function InvoiceDetail({
                 <CreditCard className="w-4 h-4 text-emerald-500" />
                 <span className="text-sm font-bold text-gray-900 dark:text-white">المدفوع</span>
               </div>
-              <span className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">
-                {formatCurrency(invoice.paidAmount)} <SarIcon className="text-gray-400" size={12} />
+              <span className="inline-flex items-center gap-1 text-xl font-extrabold text-emerald-600 dark:text-emerald-400">
+                {formatCurrency(invoice.paidAmount)} <SarIcon className="text-emerald-600 dark:text-emerald-400" size={16} />
               </span>
             </div>
           </div>
@@ -539,7 +539,7 @@ export function InvoiceDetail({
                 <AlertCircle className="w-3 h-3" />
                 المبلغ المدين المستحق
               </Label>
-              <p className="text-lg font-bold text-red-500">{formatCurrency(invoice.debtAmount)} <SarIcon className="text-red-500" size={14} /></p>
+              <span className="inline-flex items-center gap-1 text-lg font-bold text-red-500">{formatCurrency(invoice.debtAmount)} <SarIcon className="text-red-500" size={14} /></span>
             </div>
 
             <div>
