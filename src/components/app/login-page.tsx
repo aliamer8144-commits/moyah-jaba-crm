@@ -1,13 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { User, Lock, Eye, EyeOff, Droplets, Loader2 } from 'lucide-react';
+import {
+  User, Lock, Eye, EyeOff, Droplets, Loader2,
+  AlertCircle, X, KeyRound,
+} from 'lucide-react';
 
 function WaterWaves() {
   return (
@@ -123,8 +126,29 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const [setupLoading, setSetupLoading] = useState(true);
+  const [rememberMe, setRememberMe] = useState(true); // Default ON
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [showForgotDialog, setShowForgotDialog] = useState(false);
+  const [resetUsername, setResetUsername] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+
+  // Auto-setup database on first visit (seed users if not exist)
+  useEffect(() => {
+    fetch('/api/setup', { method: 'POST' })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          console.log('Database setup complete');
+        }
+      })
+      .catch((err) => {
+        console.warn('Setup check failed:', err);
+      })
+      .finally(() => {
+        setSetupLoading(false);
+      });
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -143,6 +167,16 @@ export function LoginPage() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'حدث خطأ');
+
+      // Handle "Remember Me" — if unchecked, clear persisted state after login
+      if (!rememberMe) {
+        // Clear stored session data so it's NOT persisted after this session
+        try {
+          localStorage.removeItem('jaba-water-store');
+        } catch {
+          // localStorage might be blocked
+        }
+      }
 
       setUser(data);
       setCurrentView(data.role === 'ADMIN' ? 'admin' : 'rep');
@@ -164,6 +198,11 @@ export function LoginPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'حدث خطأ');
+
+      if (!rememberMe) {
+        try { localStorage.removeItem('jaba-water-store'); } catch { /* noop */ }
+      }
+
       setUser(data);
       setCurrentView(data.role === 'ADMIN' ? 'admin' : 'rep');
       toast.success(`مرحباً ${data.name}!`);
@@ -171,6 +210,35 @@ export function LoginPage() {
       toast.error(err instanceof Error ? err.message : 'حدث خطأ');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!resetUsername.trim()) {
+      toast.error('يرجى إدخال اسم المستخدم');
+      return;
+    }
+
+    setResetLoading(true);
+    try {
+      const res = await fetch('/api/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: resetUsername.trim() }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        toast.success('تم إعادة تعيين كلمة المرور بنجاح! كلمة المرور الجديدة: reset123', { duration: 8000 });
+        setShowForgotDialog(false);
+        setResetUsername('');
+      } else {
+        toast.error(data.error || 'حدث خطأ');
+      }
+    } catch {
+      toast.error('حدث خطأ في الاتصال بالخادم');
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -268,6 +336,8 @@ export function LoginPage() {
                     ? 'bg-[#007AFF] border-[#007AFF]'
                     : 'border-gray-300'
                 }`}
+                role="checkbox"
+                aria-checked={rememberMe}
               >
                 {rememberMe && (
                   <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -281,13 +351,18 @@ export function LoginPage() {
             {/* Submit Button */}
             <Button
               type="submit"
-              disabled={loading}
+              disabled={loading || setupLoading}
               className="w-full h-12 rounded-xl bg-gradient-to-l from-[#007AFF] to-[#5856D6] text-white font-semibold text-base shadow-lg shadow-[#007AFF]/25 hover:opacity-95 transition-opacity"
             >
               {loading ? (
                 <div className="flex items-center gap-2">
                   <Loader2 className="w-5 h-5 animate-spin" />
                   <span>جارٍ تسجيل الدخول...</span>
+                </div>
+              ) : setupLoading ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>جارٍ تحضير النظام...</span>
                 </div>
               ) : (
                 'تسجيل الدخول'
@@ -299,7 +374,7 @@ export function LoginPage() {
           <div className="text-center mt-4">
             <button
               type="button"
-              onClick={() => toast.info('سيتم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني')}
+              onClick={() => setShowForgotDialog(true)}
               className="text-sm text-[#007AFF] hover:text-[#5856D6] transition-colors font-medium"
             >
               نسيت كلمة المرور؟
@@ -313,7 +388,7 @@ export function LoginPage() {
             © 2025 مياه جبأ - جميع الحقوق محفوظة
           </p>
           <p className="text-[10px] text-gray-300 dark:text-gray-700">
-            v2.0.0
+            v2.1.0
           </p>
         </div>
 
@@ -322,7 +397,7 @@ export function LoginPage() {
           <button
             type="button"
             onClick={() => handleQuickLogin('admin', 'admin123')}
-            disabled={loading}
+            disabled={loading || setupLoading}
             className="text-[11px] px-3 py-1.5 rounded-lg bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 hover:bg-orange-500/20 transition-colors"
           >
             🔑 دخول أدمن
@@ -330,13 +405,81 @@ export function LoginPage() {
           <button
             type="button"
             onClick={() => handleQuickLogin('rep1', 'rep123')}
-            disabled={loading}
+            disabled={loading || setupLoading}
             className="text-[11px] px-3 py-1.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition-colors"
           >
             🔑 دخول مندوب
           </button>
         </div>
       </motion.div>
+
+      {/* Forgot Password Dialog */}
+      {showForgotDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white dark:bg-gray-900 rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-gray-200/50 dark:border-gray-800/50"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <KeyRound className="w-5 h-5 text-[#007AFF]" />
+                <h2 className="text-lg font-bold text-[#1c1c1e] dark:text-white">إعادة تعيين كلمة المرور</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setShowForgotDialog(false); setResetUsername(''); }}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-xl p-3 mb-4 flex gap-2">
+              <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                أدخل اسم المستخدم وسيتم إعادة تعيين كلمة المرور إلى: <span className="font-bold">reset123</span>
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">اسم المستخدم</Label>
+                <Input
+                  value={resetUsername}
+                  onChange={(e) => setResetUsername(e.target.value)}
+                  placeholder="أدخل اسم المستخدم"
+                  className="bg-[#f2f2f7] dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500 rounded-xl border-0 h-11"
+                  autoComplete="username"
+                />
+              </div>
+
+              <Button
+                onClick={handleForgotPassword}
+                disabled={resetLoading || !resetUsername.trim()}
+                className="w-full h-11 rounded-xl bg-gradient-to-l from-[#007AFF] to-[#5856D6] text-white font-semibold shadow-lg shadow-[#007AFF]/25 hover:opacity-95 transition-opacity"
+              >
+                {resetLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>جارٍ الإعادة تعيين...</span>
+                  </div>
+                ) : (
+                  'إعادة تعيين كلمة المرور'
+                )}
+              </Button>
+
+              <Button
+                variant="ghost"
+                onClick={() => { setShowForgotDialog(false); setResetUsername(''); }}
+                className="w-full h-10 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                إلغاء
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
