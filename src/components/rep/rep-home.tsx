@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore, Client, Invoice } from '@/lib/store';
-import { Users, FileText, Package, AlertCircle, Clock, Sparkles, TrendingUp, Trophy, Wallet } from 'lucide-react';
+import { Users, FileText, Package, AlertCircle, Clock, Sun, Moon, TrendingUp, Trophy, Wallet } from 'lucide-react';
 import { SarIcon } from '@/components/shared/sar-icon';
 import { AchievementBadges } from '@/components/rep/achievement-badges';
 import { WeeklySummary } from '@/components/rep/weekly-summary';
@@ -383,12 +383,20 @@ export function RepHome() {
           <div className="absolute bottom-6 left-6 w-12 h-12 border border-white/5 rounded-full" />
 
           <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-1">
-              <Sparkles className="w-4 h-4 text-[#FFD60A]" />
-              <p className="text-sm opacity-80">{greeting()}،</p>
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                {(() => {
+                  const hour = new Date().getHours();
+                  const isMorning = hour >= 5 && hour < 18;
+                  return isMorning
+                    ? <Sun className="w-4 h-4 text-[#FFD60A]" />
+                    : <Moon className="w-4 h-4 text-[#C7D2FE]" />;
+                })()}
+                <p className="text-sm opacity-80">{greeting()}،</p>
+              </div>
+              <p className="text-[11px] opacity-60">{todayDate}</p>
             </div>
             <h2 className="text-2xl font-bold mt-1 drop-shadow-sm">{user?.name}</h2>
-            <p className="text-xs opacity-60 mt-2">{todayDate}</p>
             <div className="mt-3 flex items-center gap-2 text-xs opacity-70 bg-white/10 px-3 py-1.5 rounded-full inline-flex backdrop-blur-sm">
               <span>{motivational}</span>
             </div>
