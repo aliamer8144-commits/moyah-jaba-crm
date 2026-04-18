@@ -25,6 +25,7 @@ import {
   Settings,
   BarChart3,
   Package,
+  Home,
 } from 'lucide-react';
 import { Dashboard } from '@/components/admin/dashboard';
 import { RepManagement } from '@/components/admin/rep-management';
@@ -39,6 +40,15 @@ import { AdminReports } from '@/components/admin/admin-reports';
 import { AdminProducts } from '@/components/admin/admin-products';
 import { AdminQuickFab } from '@/components/admin/admin-quick-fab';
 import { NotificationsPanel } from '@/components/shared/notifications-panel';
+
+// Bottom Nav Tabs (Mobile)
+const bottomNavTabs = [
+  { id: 'dashboard' as const, label: 'الرئيسية', icon: Home },
+  { id: 'reps' as const, label: 'المناديب', icon: UserCircle },
+  { id: 'clients' as const, label: 'العملاء', icon: Users },
+  { id: 'reports' as const, label: 'التقارير', icon: BarChart3 },
+  { id: 'settings' as const, label: 'الملف الشخصي', icon: Settings },
+];
 
 const navItems = [
   { id: 'dashboard' as const, label: 'لوحة التحكم', icon: LayoutDashboard },
@@ -65,6 +75,7 @@ export function AdminView() {
   const { theme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [animatingTab, setAnimatingTab] = useState<string | null>(null);
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
@@ -93,7 +104,7 @@ export function AdminView() {
     toast.success('تم تسجيل الخروج');
   };
 
-  const currentLabel = navItems.find((n) => n.id === adminTab)?.label || 'لوحة التحكم';
+  const currentLabel = bottomNavTabs.find((n) => n.id === adminTab)?.label || navItems.find((n) => n.id === adminTab)?.label || 'الرئيسية';
 
   const renderContent = () => {
     switch (adminTab) {
@@ -231,7 +242,7 @@ export function AdminView() {
         </header>
 
         {/* Page Content */}
-        <main className="p-4 md:p-6 pb-20">
+        <main className="p-4 md:p-6 pb-28 md:pb-20">
           <AnimatePresence mode="wait">
             <motion.div key={adminTab} variants={pageVariants} initial="initial" animate="animate" exit="exit" className="page-transition-enter">
               {renderContent()}
@@ -318,6 +329,53 @@ export function AdminView() {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Bottom Navigation - Modern Floating Gradient Style (Mobile) */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-1 pointer-events-none">
+        <div className="relative max-w-md mx-auto rounded-2xl shadow-[0_-2px_30px_rgba(0,122,255,0.15),0_0_0_0.5px_rgba(88,86,214,0.1)] dark:shadow-[0_-2px_30px_rgba(0,0,0,0.4),0_0_0_0.5px_rgba(255,255,255,0.05)] overflow-hidden pointer-events-auto">
+          {/* Gradient Background */}
+          <div className="absolute inset-0 gradient-mesh-blue" />
+          {/* Subtle mesh overlay */}
+          <div className="absolute inset-0 bg-white/5" />
+
+          <div className="relative flex items-center justify-around h-14 px-1">
+            {bottomNavTabs.map((tab) => {
+              const isActive = adminTab === tab.id;
+              const isAnimating = animatingTab === tab.id;
+              const Icon = tab.icon;
+              return (
+                <motion.button
+                  key={tab.id}
+                  whileTap={{ scale: 0.85 }}
+                  onClick={() => {
+                    setAnimatingTab(tab.id);
+                    setAdminTab(tab.id);
+                    setTimeout(() => setAnimatingTab(null), 500);
+                  }}
+                  className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all duration-300 relative min-w-[56px] ${
+                    isActive ? 'text-white' : 'text-white/60'
+                  } ${isAnimating ? 'animate-tab-press' : ''}`}
+                >
+                  {/* Active background pill */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="adminActiveTabBg"
+                      className="absolute inset-1 bg-white/20 rounded-xl"
+                      transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                  <div className={`relative z-10 flex flex-col items-center ${isAnimating ? 'animate-spring-bounce' : ''}`}>
+                    <Icon className={`w-[22px] h-[22px] transition-all duration-300 ${isActive ? 'stroke-[2.5]' : ''}`} />
+                    <span className={`text-[10px] mt-0.5 transition-all duration-300 leading-tight ${isActive ? 'font-bold' : 'font-medium'}`}>
+                      {tab.label}
+                    </span>
+                  </div>
+                </motion.button>
+              );
+            })}
+          </div>
+        </div>
+      </nav>
 
       {/* Admin FAB */}
       <AdminQuickFab />
