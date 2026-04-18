@@ -23,7 +23,6 @@ import {
   ClipboardList,
   Activity,
   Settings,
-  MapPin,
   BarChart3,
   Package,
 } from 'lucide-react';
@@ -36,7 +35,6 @@ import { RequestManagement } from '@/components/admin/request-management';
 import { ActivityLog } from '@/components/admin/activity-log';
 import { AdminNotifications } from '@/components/admin/admin-notifications';
 import { AdminSettings } from '@/components/admin/admin-settings';
-import { AdminVisits } from '@/components/admin/admin-visits';
 import { AdminReports } from '@/components/admin/admin-reports';
 import { AdminProducts } from '@/components/admin/admin-products';
 import { NotificationsPanel } from '@/components/shared/notifications-panel';
@@ -48,7 +46,6 @@ const navItems = [
   { id: 'clients' as const, label: 'العملاء', icon: Users },
   { id: 'invoices' as const, label: 'الفواتير', icon: FileText },
   { id: 'receipts' as const, label: 'سندات القبض', icon: Receipt },
-  { id: 'visits' as const, label: 'زيارات', icon: MapPin },
   { id: 'products' as const, label: 'المنتجات', icon: Package },
   { id: 'requests' as const, label: 'الطلبات', icon: ClipboardList },
   { id: 'activity' as const, label: 'سجل النشاط', icon: Activity },
@@ -105,7 +102,6 @@ export function AdminView() {
       case 'clients': return <AdminClients />;
       case 'invoices': return <AdminInvoices />;
       case 'receipts': return <AdminReceipts />;
-      case 'visits': return <AdminVisits />;
       case 'products': return <AdminProducts />;
       case 'requests': return <RequestManagement />;
       case 'activity': return <ActivityLog />;

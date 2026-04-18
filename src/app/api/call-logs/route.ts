@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
     }
 
-    const validTypes = ["call", "whatsapp", "visit", "note"];
+    const validTypes = ["call", "whatsapp", "note"];
     if (!validTypes.includes(type)) {
       return NextResponse.json(
         { error: "نوع التواصل غير صالح" },
@@ -77,7 +77,6 @@ export async function POST(request: NextRequest) {
     const typeLabels: Record<string, string> = {
       call: "اتصال هاتفي",
       whatsapp: "رسالة واتساب",
-      visit: "زيارة",
       note: "ملاحظة",
     };
 

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore, Client, Invoice } from '@/lib/store';
-import { Users, FileText, Package, AlertCircle, Clock, Sparkles, TrendingUp, Target, DollarSign, MapPin as MapPinIcon, Trophy, Wallet } from 'lucide-react';
+import { Users, FileText, Package, AlertCircle, Clock, Sparkles, TrendingUp, Target, DollarSign, Trophy, Wallet } from 'lucide-react';
 import { SarIcon } from '@/components/shared/sar-icon';
 import { DailyGoals } from '@/components/rep/daily-goals';
 import { AchievementBadges } from '@/components/rep/achievement-badges';
@@ -106,7 +106,6 @@ interface QuickStats {
   totalInvoicesToday: number;
   activeClientsToday: number;
   amountCollectedToday: number;
-  completedVisitsToday: number;
 }
 
 function TodaysQuickStats() {
@@ -115,7 +114,6 @@ function TodaysQuickStats() {
     totalInvoicesToday: 0,
     activeClientsToday: 0,
     amountCollectedToday: 0,
-    completedVisitsToday: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -127,17 +125,15 @@ function TodaysQuickStats() {
 
     const fetchStats = async () => {
       try {
-        const [invoicesRes, clientsRes, receiptsRes, visitsRes] = await Promise.all([
+        const [invoicesRes, clientsRes, receiptsRes] = await Promise.all([
           fetch(`/api/invoices?repId=${user.id}`),
           fetch(`/api/clients?repId=${user.id}`),
           fetch(`/api/receipts?repId=${user.id}`),
-          fetch(`/api/visits?repId=${user.id}`),
         ]);
 
         let todayInvoices = 0;
         let todayClientIds = new Set<string>();
         let todayCollected = 0;
-        let todayVisits = 0;
 
         if (invoicesRes.ok) {
           const invoices = await invoicesRes.json();
@@ -171,21 +167,10 @@ function TodaysQuickStats() {
           }
         }
 
-        if (visitsRes.ok) {
-          const visits = await visitsRes.json();
-          for (const v of visits) {
-            const vDate = new Date(v.date || v.createdAt);
-            if (vDate >= today && v.status === 'completed') {
-              todayVisits++;
-            }
-          }
-        }
-
         setStats({
           totalInvoicesToday: todayInvoices,
           activeClientsToday: todayClientIds.size,
           amountCollectedToday: todayCollected,
-          completedVisitsToday: todayVisits,
         });
       } catch {
         // silent
@@ -223,20 +208,12 @@ function TodaysQuickStats() {
       iconColor: 'text-[#AF52DE]',
       format: true,
     },
-    {
-      label: 'الزيارات المنجزة',
-      value: stats.completedVisitsToday,
-      icon: MapPinIcon,
-      gradient: 'from-[#FF9500] to-[#E68A00]',
-      iconBg: 'bg-[#FF9500]/15',
-      iconColor: 'text-[#FF9500]',
-    },
   ];
 
   if (loading) {
     return (
       <div className="grid grid-cols-2 gap-3">
-        {[1, 2, 3, 4].map((i) => (
+        {[1, 2, 3].map((i) => (
           <div key={i} className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm shimmer-loading">
             <div className="flex items-center justify-between mb-2">
               <Skeleton className="w-9 h-9 rounded-xl" />
@@ -297,7 +274,6 @@ function DailyGoalsSection() {
   const [goalData, setGoalData] = useState<any>(null);
   const [actualRevenue, setActualRevenue] = useState(0);
   const [actualClients, setActualClients] = useState(0);
-  const [actualVisits, setActualVisits] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -309,7 +285,6 @@ function DailyGoalsSection() {
           setGoalData(data.goal);
           setActualRevenue(data.actualRevenue);
           setActualClients(data.actualClients);
-          setActualVisits(data.actualVisits);
         }
       })
       .catch(() => {})
@@ -318,21 +293,17 @@ function DailyGoalsSection() {
 
   const tRevenue = goalData?.targetRevenue || 0;
   const tClients = goalData?.targetClients || 0;
-  const tVisits = goalData?.targetVisits || 0;
   const aRevenue = goalData?.actualRevenue ?? actualRevenue;
   const aClients = goalData?.actualClients ?? actualClients;
-  const aVisits = goalData?.actualVisits ?? actualVisits;
 
   const revenuePct = tRevenue > 0 ? Math.min(Math.round((aRevenue / tRevenue) * 100), 100) : 0;
   const clientsPct = tClients > 0 ? Math.min(Math.round((aClients / tClients) * 100), 100) : 0;
-  const visitsPct = tVisits > 0 ? Math.min(Math.round((aVisits / tVisits) * 100), 100) : 0;
 
   let overallPct = 0;
-  if (tRevenue > 0 || tClients > 0 || tVisits > 0) {
+  if (tRevenue > 0 || tClients > 0) {
     const pR = tRevenue > 0 ? Math.min(aRevenue / tRevenue, 1) : 1;
     const pC = tClients > 0 ? Math.min(aClients / tClients, 1) : 1;
-    const pV = tVisits > 0 ? Math.min(aVisits / tVisits, 1) : 1;
-    overallPct = Math.round(((pR + pC + pV) / 3) * 100);
+    overallPct = Math.round(((pR + pC) / 2) * 100);
   }
 
   if (loading) {
@@ -423,26 +394,6 @@ function DailyGoalsSection() {
               animate={{ width: `${clientsPct}%` }}
               transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
               className="h-full bg-gradient-to-l from-[#007AFF] to-[#5AC8FA] rounded-full"
-            />
-          </div>
-        </div>
-        {/* Visits */}
-        <div>
-          <div className="flex items-center justify-between text-xs mb-1">
-            <span className="text-gray-500 flex items-center gap-1">
-              <MapPinIcon className="w-3 h-3 text-[#AF52DE]" />
-              الزيارات
-            </span>
-            <span className="font-medium text-[#1c1c1e] dark:text-white">
-              {aVisits} / {tVisits}
-            </span>
-          </div>
-          <div className="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${visitsPct}%` }}
-              transition={{ duration: 0.8, ease: 'easeOut', delay: 0.2 }}
-              className="h-full bg-gradient-to-l from-[#AF52DE] to-[#BF5AF2] rounded-full"
             />
           </div>
         </div>

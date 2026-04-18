@@ -28,7 +28,6 @@ model User {
   notifications  Notification[]
   activityLogs   ActivityLog[]
   expenses       Expense[]
-  visitLogs      VisitLog[]
   dailyGoals     DailyGoal[]
   callLogs       CallLog[]
 
@@ -52,7 +51,6 @@ model Client {
   rep      User     @relation(fields: [repId], references: [id], onDelete: Cascade)
   invoices Invoice[]
   receipts Receipt[]
-  visitLogs VisitLog[]
   callLogs CallLog[]
 
   @@index([repId])
@@ -177,32 +175,13 @@ model Expense {
   @@index([date])
 }
 
-model VisitLog {
-  id         String   @id @default(cuid())
-  repId      String
-  clientId   String?
-  clientName String   @db.VarChar(200)
-  notes      String?  @db.Text
-  status     String   @default("completed") @db.VarChar(20) // completed, no_answer, rescheduled
-  date       DateTime @default(now())
-  createdAt  DateTime @default(now())
-
-  rep    User    @relation(fields: [repId], references: [id], onDelete: Cascade)
-  client Client? @relation(fields: [clientId], references: [id], onDelete: SetNull)
-
-  @@index([repId])
-  @@index([date])
-}
-
 model DailyGoal {
   id            String   @id @default(cuid())
   repId         String
   targetRevenue Float    @default(0)
   targetClients Int      @default(0)
-  targetVisits  Int      @default(0)
   actualRevenue Float    @default(0)
   actualClients Int      @default(0)
-  actualVisits  Int      @default(0)
   date          DateTime @default(now())
   createdAt     DateTime @default(now())
 

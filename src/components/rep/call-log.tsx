@@ -17,7 +17,6 @@ import { useAppStore } from '@/lib/store';
 import {
   Phone,
   MessageCircle,
-  MapPin,
   StickyNote,
   Clock,
 } from 'lucide-react';
@@ -44,12 +43,6 @@ const TYPE_CONFIG: Record<string, {
     icon: <MessageCircle className="w-3.5 h-3.5" />,
     color: '#25D366',
     bgColor: 'rgba(37,211,102,0.1)',
-  },
-  visit: {
-    label: 'زيارة',
-    icon: <MapPin className="w-3.5 h-3.5" />,
-    color: '#AF52DE',
-    bgColor: 'rgba(175,82,222,0.1)',
   },
   note: {
     label: 'ملاحظة',
@@ -138,8 +131,8 @@ export function CallLog({ clientId }: CallLogProps) {
   const handleSubmit = async () => {
     if (!user) return;
 
-    // Visits and notes require notes
-    if ((dialogType === 'visit' || dialogType === 'note') && !notes.trim()) {
+    // Notes require notes
+    if (dialogType === 'note' && !notes.trim()) {
       toast.error('يرجى كتابة ملاحظات');
       return;
     }
@@ -331,17 +324,13 @@ export function CallLog({ clientId }: CallLogProps) {
             ) : (
               <div className="space-y-1.5">
                 <label className="block text-sm font-medium text-gray-700">
-                  {dialogType === 'visit' ? 'تفاصيل الزيارة' : 'الملاحظات'}
+                  الملاحظات
                   <span className="text-[#FF3B30] mr-1">*</span>
                 </label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder={
-                    dialogType === 'visit'
-                      ? 'اكتب تفاصيل الزيارة...'
-                      : 'اكتب ملاحظاتك هنا...'
-                  }
+                  placeholder="اكتب ملاحظاتك هنا..."
                   className="w-full bg-[#f2f2f7] rounded-xl border-0 p-3 text-sm resize-none focus:ring-2 ring-[#007AFF]/20 min-h-[100px]"
                   autoFocus
                 />
@@ -364,7 +353,7 @@ export function CallLog({ clientId }: CallLogProps) {
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={submitting || ((dialogType === 'visit' || dialogType === 'note') && !notes.trim())}
+              disabled={submitting || (dialogType === 'note' && !notes.trim())}
               className="flex-1 h-11 rounded-xl bg-[#007AFF] text-white font-semibold"
             >
               {submitting ? (

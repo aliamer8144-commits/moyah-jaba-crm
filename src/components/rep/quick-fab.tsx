@@ -3,20 +3,19 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
-import { Plus, FilePlus, Receipt, MapPin, UserPlus } from 'lucide-react';
+import { Plus, FilePlus, Receipt, UserPlus } from 'lucide-react';
 
 interface FabAction {
   id: string;
   label: string;
   icon: React.ElementType;
   color: string;
-  tab: 'create-invoice' | 'expenses' | 'visits' | 'clients';
+  tab: 'create-invoice' | 'expenses' | 'clients';
 }
 
 const fabActions: FabAction[] = [
   { id: 'invoice', label: 'فاتورة جديدة', icon: FilePlus, color: '#007AFF', tab: 'create-invoice' },
   { id: 'expense', label: 'تسجيل مصروف', icon: Receipt, color: '#FF9500', tab: 'expenses' },
-  { id: 'visit', label: 'تسجيل زيارة', icon: MapPin, color: '#34C759', tab: 'visits' },
   { id: 'client', label: 'إضافة عميل', icon: UserPlus, color: '#AF52DE', tab: 'clients' },
 ];
 

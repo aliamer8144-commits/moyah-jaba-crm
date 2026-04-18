@@ -97,19 +97,6 @@ export interface Receipt {
   client?: Client;
 }
 
-export interface VisitLog {
-  id: string;
-  repId: string;
-  clientId: string | null;
-  clientName: string;
-  notes: string | null;
-  status: string;
-  date: string;
-  createdAt: string;
-  rep?: User;
-  client?: Client;
-}
-
 export interface Product {
   id: string;
   name: string;
@@ -136,10 +123,8 @@ export interface DailyGoal {
   repId: string;
   targetRevenue: number;
   targetClients: number;
-  targetVisits: number;
   actualRevenue: number;
   actualClients: number;
-  actualVisits: number;
   date: string;
   createdAt: string;
 }
@@ -159,12 +144,12 @@ interface AppState {
   setCurrentView: (view: "login" | "rep" | "admin") => void;
 
   // Rep Navigation
-  repTab: "home" | "clients" | "create-invoice" | "invoices" | "expenses" | "visits" | "requests" | "profile";
-  setRepTab: (tab: "home" | "clients" | "create-invoice" | "invoices" | "expenses" | "visits" | "requests" | "profile") => void;
+  repTab: "home" | "clients" | "create-invoice" | "invoices" | "expenses" | "requests" | "profile";
+  setRepTab: (tab: "home" | "clients" | "create-invoice" | "invoices" | "expenses" | "requests" | "profile") => void;
 
   // Admin Navigation
-  adminTab: "dashboard" | "reports" | "reps" | "clients" | "invoices" | "receipts" | "visits" | "products" | "requests" | "activity" | "notifications" | "settings";
-  setAdminTab: (tab: "dashboard" | "reports" | "reps" | "clients" | "invoices" | "receipts" | "visits" | "products" | "requests" | "activity" | "notifications" | "settings") => void;
+  adminTab: "dashboard" | "reports" | "reps" | "clients" | "invoices" | "receipts" | "products" | "requests" | "activity" | "notifications" | "settings";
+  setAdminTab: (tab: "dashboard" | "reports" | "reps" | "clients" | "invoices" | "receipts" | "products" | "requests" | "activity" | "notifications" | "settings") => void;
 
   // Selected items
   selectedClientId: string | null;

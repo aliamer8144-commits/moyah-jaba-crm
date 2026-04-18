@@ -18,7 +18,6 @@ import {
   TrendingUp,
   Users,
   DollarSign,
-  MapPin,
   Plus,
   Sparkles,
   Zap,
@@ -32,10 +31,8 @@ interface GoalData {
   repId: string;
   targetRevenue: number;
   targetClients: number;
-  targetVisits: number;
   actualRevenue: number;
   actualClients: number;
-  actualVisits: number;
   date: string;
 }
 
@@ -121,13 +118,11 @@ export function DailyGoals({ onGoalSet }: DailyGoalsProps) {
   const [goalData, setGoalData] = useState<GoalData | null>(null);
   const [actualRevenue, setActualRevenue] = useState(0);
   const [actualClients, setActualClients] = useState(0);
-  const [actualVisits, setActualVisits] = useState(0);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [targetRevenue, setTargetRevenue] = useState('');
   const [targetClients, setTargetClients] = useState('');
-  const [targetVisits, setTargetVisits] = useState('');
   const [streakData, setStreakData] = useState<StreakData | null>(null);
 
   const fetchGoals = useCallback(async () => {
@@ -144,7 +139,6 @@ export function DailyGoals({ onGoalSet }: DailyGoalsProps) {
         }
         setActualRevenue(data.actualRevenue);
         setActualClients(data.actualClients);
-        setActualVisits(data.actualVisits);
       }
       if (streakRes.ok) {
         const streak = await streakRes.json();
@@ -172,7 +166,6 @@ export function DailyGoals({ onGoalSet }: DailyGoalsProps) {
           repId: user.id,
           targetRevenue: parseFloat(targetRevenue) || 0,
           targetClients: parseInt(targetClients) || 0,
-          targetVisits: parseInt(targetVisits) || 0,
         }),
       });
 
@@ -181,7 +174,6 @@ export function DailyGoals({ onGoalSet }: DailyGoalsProps) {
         setDialogOpen(false);
         setTargetRevenue('');
         setTargetClients('');
-        setTargetVisits('');
         fetchGoals();
         onGoalSet?.();
       } else {
@@ -196,19 +188,16 @@ export function DailyGoals({ onGoalSet }: DailyGoalsProps) {
 
   const tRevenue = goalData?.targetRevenue || 0;
   const tClients = goalData?.targetClients || 0;
-  const tVisits = goalData?.targetVisits || 0;
 
   const aRevenue = goalData?.actualRevenue ?? actualRevenue;
   const aClients = goalData?.actualClients ?? actualClients;
-  const aVisits = goalData?.actualVisits ?? actualVisits;
 
   // Overall completion percentage
   let overallPct = 0;
-  if (tRevenue > 0 || tClients > 0 || tVisits > 0) {
+  if (tRevenue > 0 || tClients > 0) {
     const pctRevenue = tRevenue > 0 ? Math.min(aRevenue / tRevenue, 1) : 1;
     const pctClients = tClients > 0 ? Math.min(aClients / tClients, 1) : 1;
-    const pctVisits = tVisits > 0 ? Math.min(aVisits / tVisits, 1) : 1;
-    overallPct = Math.round(((pctRevenue + pctClients + pctVisits) / 3) * 100);
+    overallPct = Math.round(((pctRevenue + pctClients) / 2) * 100);
   }
 
   const motivational = getMotivationalMessage(overallPct);
@@ -273,23 +262,9 @@ export function DailyGoals({ onGoalSet }: DailyGoalsProps) {
                     dir="ltr"
                   />
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5">
-                    <MapPin className="w-4 h-4 text-[#AF52DE]" />
-                    عدد الزيارات
-                  </label>
-                  <Input
-                    type="number"
-                    value={targetVisits}
-                    onChange={(e) => setTargetVisits(e.target.value)}
-                    placeholder="0"
-                    className="rounded-xl border-gray-200 text-left text-lg font-bold"
-                    dir="ltr"
-                  />
-                </div>
                 <Button
                   onClick={handleSetGoal}
-                  disabled={submitting || (!targetRevenue && !targetClients && !targetVisits)}
+                  disabled={submitting || (!targetRevenue && !targetClients)}
                   className="w-full h-11 rounded-xl bg-gradient-to-r from-[#007AFF] to-[#5856D6] text-white font-semibold"
                 >
                   {submitting ? (
@@ -384,23 +359,9 @@ export function DailyGoals({ onGoalSet }: DailyGoalsProps) {
                       dir="ltr"
                     />
                   </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 mb-1.5 flex items-center gap-1.5">
-                      <MapPin className="w-4 h-4 text-[#AF52DE]" />
-                      عدد الزيارات
-                    </label>
-                    <Input
-                      type="number"
-                      value={targetVisits || goalData.targetVisits}
-                      onChange={(e) => setTargetVisits(e.target.value)}
-                      placeholder="0"
-                      className="rounded-xl border-gray-200 text-left text-lg font-bold"
-                      dir="ltr"
-                    />
-                  </div>
                   <Button
                     onClick={handleSetGoal}
-                    disabled={submitting || (!targetRevenue && !targetClients && !targetVisits)}
+                    disabled={submitting || (!targetRevenue && !targetClients)}
                     className="w-full h-11 rounded-xl bg-gradient-to-r from-[#007AFF] to-[#5856D6] text-white font-semibold"
                   >
                     {submitting ? (
@@ -463,7 +424,7 @@ export function DailyGoals({ onGoalSet }: DailyGoalsProps) {
           </div>
 
           {/* Individual Progress Rings */}
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             {/* Revenue */}
             <div className="text-center">
               <CircularProgress
@@ -501,26 +462,6 @@ export function DailyGoals({ onGoalSet }: DailyGoalsProps) {
               </p>
               <p className="text-[10px] text-gray-400">
                 من {tClients}
-              </p>
-            </div>
-
-            {/* Visits */}
-            <div className="text-center">
-              <CircularProgress
-                value={aVisits}
-                max={tVisits || 1}
-                color="#AF52DE"
-                size={64}
-                strokeWidth={5}
-              >
-                <MapPin className="w-4 h-4 text-[#AF52DE]" />
-              </CircularProgress>
-              <p className="text-[11px] text-gray-500 mt-1.5 font-medium">الزيارات</p>
-              <p className="text-xs font-bold text-[#1c1c1e]">
-                {aVisits}
-              </p>
-              <p className="text-[10px] text-gray-400">
-                من {tVisits}
               </p>
             </div>
           </div>

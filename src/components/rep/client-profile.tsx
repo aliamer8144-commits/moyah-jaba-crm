@@ -25,7 +25,6 @@ import {
   MessageCircle,
   Tag,
 } from 'lucide-react';
-import { VisitLog } from '@/components/rep/visit-log';
 import { SarIcon } from '@/components/shared/sar-icon';
 import { CallLog } from '@/components/rep/call-log';
 import { ClientInsights } from '@/components/rep/client-insights';
@@ -464,15 +463,6 @@ export function ClientProfile({ onBack, onRefresh }: { onBack: () => void; onRef
           <Wallet className="w-4 h-4 ml-1.5" />
           سند قبض
         </Button>
-      </div>
-
-      {/* Log Visit Quick Action */}
-      <div className="mx-4">
-        <VisitLog
-          compact
-          clientId={selectedClientId!}
-          clientName={client.name}
-        />
       </div>
 
       {/* Invoices */}

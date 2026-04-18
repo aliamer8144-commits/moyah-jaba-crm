@@ -44,16 +44,8 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const todayVisits = await db.visitLog.findMany({
-      where: {
-        repId,
-        createdAt: { gte: startOfDay, lt: endOfDay },
-      },
-    });
-
     const actualRevenue = todayInvoices.reduce((sum, inv) => sum + inv.finalTotal, 0);
     const actualClients = todayClients.length;
-    const actualVisits = todayVisits.length;
 
     // If goal exists, update actual values
     if (goal) {
@@ -62,14 +54,12 @@ export async function GET(request: NextRequest) {
         data: {
           actualRevenue,
           actualClients,
-          actualVisits,
         },
       });
       goal = {
         ...goal,
         actualRevenue,
         actualClients,
-        actualVisits,
       };
     }
 
@@ -77,7 +67,6 @@ export async function GET(request: NextRequest) {
       goal,
       actualRevenue,
       actualClients,
-      actualVisits,
     });
   } catch (error) {
     console.error("Get daily goals error:", error);
@@ -89,7 +78,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { repId, targetRevenue, targetClients, targetVisits } = body;
+    const { repId, targetRevenue, targetClients } = body;
 
     if (!repId) {
       return NextResponse.json({ error: "معرف المندوب مطلوب" }, { status: 400 });
@@ -114,7 +103,6 @@ export async function POST(request: NextRequest) {
         data: {
           targetRevenue: targetRevenue ?? 0,
           targetClients: targetClients ?? 0,
-          targetVisits: targetVisits ?? 0,
         },
       }));
       return NextResponse.json(updated);
@@ -126,10 +114,8 @@ export async function POST(request: NextRequest) {
         repId,
         targetRevenue: targetRevenue ?? 0,
         targetClients: targetClients ?? 0,
-        targetVisits: targetVisits ?? 0,
         actualRevenue: 0,
         actualClients: 0,
-        actualVisits: 0,
       },
     }));
 
@@ -144,7 +130,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { goalId, actualRevenue, actualClients, actualVisits } = body;
+    const { goalId, actualRevenue, actualClients } = body;
 
     if (!goalId) {
       return NextResponse.json({ error: "معرف الهدف مطلوب" }, { status: 400 });
@@ -155,7 +141,6 @@ export async function PUT(request: NextRequest) {
       data: {
         ...(actualRevenue !== undefined && { actualRevenue }),
         ...(actualClients !== undefined && { actualClients }),
-        ...(actualVisits !== undefined && { actualVisits }),
       },
     }));
 

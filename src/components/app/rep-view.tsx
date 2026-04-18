@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
-import { Droplets, Home, Users, Plus, FileText, UserCircle, Bell, ClipboardList, RefreshCw, ArrowDown, MapPin, Receipt } from 'lucide-react';
+import { Droplets, Home, Users, Plus, FileText, UserCircle, Bell, ClipboardList, RefreshCw, ArrowDown, Receipt } from 'lucide-react';
 import { RepHome } from '@/components/rep/rep-home';
 import { ClientList } from '@/components/rep/client-list';
 import { InvoiceForm } from '@/components/rep/invoice-form';
@@ -13,7 +13,6 @@ import { RepProfile } from '@/components/rep/rep-profile';
 import { ClientProfile } from '@/components/rep/client-profile';
 import { NotificationsPanel } from '@/components/shared/notifications-panel';
 import { RequestForm } from '@/components/shared/request-form';
-import { VisitLog } from '@/components/rep/visit-log';
 import { ExpenseTracker } from '@/components/rep/expense-tracker';
 import { QuickFab } from '@/components/rep/quick-fab';
 
@@ -23,7 +22,6 @@ const tabs = [
   { id: 'create-invoice' as const, label: 'فاتورة', icon: Plus, isCenter: true },
   { id: 'invoices' as const, label: 'الفواتير', icon: FileText },
   { id: 'expenses' as const, label: 'المصروفات', icon: Receipt },
-  { id: 'visits' as const, label: 'الزيارات', icon: MapPin },
   { id: 'requests' as const, label: 'طلباتي', icon: ClipboardList },
   { id: 'profile' as const, label: 'حسابي', icon: UserCircle },
 ];
@@ -190,8 +188,6 @@ export function RepView() {
         return <InvoiceList key={refreshKey} />;
       case 'expenses':
         return <ExpenseTracker />;
-      case 'visits':
-        return <VisitLog />;
       case 'requests':
         return <MyRequests />;
       case 'profile':
