@@ -17,7 +17,6 @@ import {
   Package,
   CreditCard,
   CalendarDays,
-  Sparkles,
   AlertTriangle,
   Eye,
   TrendingDown,
@@ -35,6 +34,9 @@ import {
   UserPlus2,
   Banknote,
   Percent,
+  Sun,
+  Moon,
+  Shield,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SarIcon } from '@/components/shared/sar-icon';
@@ -391,56 +393,67 @@ export function Dashboard() {
 
   return (
     <motion.div variants={stagger} initial="initial" animate="animate" className="space-y-6">
-      {/* Welcome Greeting & Date + Auto-Refresh */}
-      <motion.div variants={fadeUp} className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div>
-            <h2 className="text-xl font-bold text-[#1c1c1e] dark:text-white flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[#FF9500]" />
-              مرحباً، المدير
-            </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{getTodayArabicDate()}</p>
-          </div>
-          {/* Connection Status Dot */}
-          <div className="flex items-center gap-1.5">
-            <motion.div
-              animate={{ scale: connectionStatus === 'lost' ? [1, 1.2, 1] : 1 }}
-              transition={{ duration: 1.5, repeat: connectionStatus === 'lost' ? Infinity : 0 }}
-              className={`w-2.5 h-2.5 rounded-full ${
-                connectionStatus === 'fresh' ? 'bg-[#34C759] shadow-[#34C759]/50 shadow-sm' :
-                connectionStatus === 'stale' ? 'bg-[#FF9500] shadow-[#FF9500]/50 shadow-sm' :
-                'bg-[#FF3B30] shadow-[#FF3B30]/50 shadow-sm'
-              }`}
-              title={
-                connectionStatus === 'fresh' ? 'بيانات محدثة' :
-                connectionStatus === 'stale' ? 'بيانات قديمة' :
-                'فقدان الاتصال'
-              }
-            />
-            <span className="text-[10px] text-gray-400 dark:text-gray-500 hidden sm:inline">
-              {formatLastRefreshed()}
-            </span>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {/* Manual Refresh Button */}
-          <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={handleManualRefresh}
-            disabled={isRefreshing}
-            className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 px-3 py-1.5 rounded-full transition-colors disabled:opacity-50"
-          >
-            <motion.span
-              animate={isRefreshing ? { rotate: 360 } : { rotate: 0 }}
-              transition={isRefreshing ? { duration: 1, repeat: Infinity, ease: 'linear' } : { duration: 0 }}
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-            </motion.span>
-            <span className="hidden sm:inline">تحديث</span>
-          </motion.button>
-          <div className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 rounded-full">
-            <CalendarDays className="w-3.5 h-3.5" />
-            {new Date().toLocaleDateString('ar-SA', { weekday: 'short' })}
+      {/* Greeting Card with Gradient Mesh Background */}
+      <motion.div variants={fadeUp}>
+        <div className="gradient-mesh-blue rounded-2xl p-5 text-white shadow-lg shadow-[#007AFF]/20 relative overflow-hidden">
+          {/* Decorative mesh overlays */}
+          <div className="absolute top-0 left-0 w-40 h-40 bg-white/5 rounded-full -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 right-0 w-32 h-32 bg-white/5 rounded-full translate-x-1/4 translate-y-1/4" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-white/3 rounded-full blur-2xl" />
+          <div className="absolute top-3 right-3 w-3 h-3 bg-white/20 rounded-full animate-badge-pulse" />
+          <div className="absolute top-3 right-10 w-2 h-2 bg-white/15 rounded-full animate-badge-pulse" style={{ animationDelay: '0.5s' }} />
+          <div className="absolute bottom-4 left-4 w-20 h-20 border border-white/10 rounded-full" />
+          <div className="absolute bottom-6 left-6 w-12 h-12 border border-white/5 rounded-full" />
+
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-[#FFD60A]" />
+                <p className="text-sm opacity-80">{(() => {
+                  const hour = new Date().getHours();
+                  return hour < 12 ? 'صباح الخير،' : 'مساء الخير،';
+                })()}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <p className="text-[11px] opacity-60">{getTodayArabicDate()}</p>
+                {(() => {
+                  const hour = new Date().getHours();
+                  const isMorning = hour < 12;
+                  return isMorning
+                    ? <Sun className="w-4 h-4 text-[#FFD60A]" />
+                    : <Moon className="w-4 h-4 text-[#FFD60A]" />;
+                })()}
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold mt-1 drop-shadow-sm">{user?.name || 'المدير'}</h2>
+            <div className="mt-3 flex items-center gap-3">
+              <div className="flex items-center gap-1.5 text-xs opacity-70 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-sm">
+                <motion.div
+                  animate={{ scale: connectionStatus === 'lost' ? [1, 1.2, 1] : 1 }}
+                  transition={{ duration: 1.5, repeat: connectionStatus === 'lost' ? Infinity : 0 }}
+                  className={`w-2 h-2 rounded-full ${
+                    connectionStatus === 'fresh' ? 'bg-[#34C759]' :
+                    connectionStatus === 'stale' ? 'bg-[#FF9500]' :
+                    'bg-[#FF3B30]'
+                  }`}
+                />
+                <span>{formatLastRefreshed()}</span>
+              </div>
+              <motion.button
+                whileTap={{ scale: 0.9 }}
+                onClick={handleManualRefresh}
+                disabled={isRefreshing}
+                className="flex items-center gap-1.5 text-xs opacity-70 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-sm hover:bg-white/20 transition-colors disabled:opacity-50"
+              >
+                <motion.span
+                  animate={isRefreshing ? { rotate: 360 } : { rotate: 0 }}
+                  transition={isRefreshing ? { duration: 1, repeat: Infinity, ease: 'linear' } : { duration: 0 }}
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                </motion.span>
+                <span>تحديث</span>
+              </motion.button>
+            </div>
           </div>
         </div>
       </motion.div>
