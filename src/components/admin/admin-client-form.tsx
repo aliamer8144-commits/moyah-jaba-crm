@@ -67,9 +67,13 @@ export function AdminClientFormDialog({ open, onOpenChange }: AdminClientFormDia
 
   useEffect(() => {
     if (open && user) {
-      fetch(`/api/reps?adminId=${user.id}`)
+      fetch(`/api/auth?adminId=${user.id}`)
         .then((res) => res.json())
-        .then((data) => setReps(data.filter((r: User) => r.isActive)))
+        .then((data) => {
+          if (Array.isArray(data)) {
+            setReps(data.filter((r: User) => r.isActive));
+          }
+        })
         .catch(() => {});
       resetForm();
     }

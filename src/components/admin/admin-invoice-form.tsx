@@ -113,10 +113,12 @@ export function AdminInvoiceFormDialog({ open, onOpenChange }: AdminInvoiceFormD
   // Fetch reps when dialog opens
   useEffect(() => {
     if (open && user) {
-      fetch(`/api/reps?adminId=${user.id}`)
+      fetch(`/api/auth?adminId=${user.id}`)
         .then((res) => res.json())
         .then((data) => {
-          setReps(data.filter((r: User) => r.isActive));
+          if (Array.isArray(data)) {
+            setReps(data.filter((r: User) => r.isActive));
+          }
         })
         .catch(() => {});
       resetForm();
