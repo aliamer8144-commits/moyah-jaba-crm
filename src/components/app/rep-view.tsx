@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
-import { Droplets, Home, Users, FileText, UserCircle, Bell, ClipboardList, RefreshCw, ArrowDown, Receipt } from 'lucide-react';
+import { Droplets, Home, Users, FileText, UserCircle, Bell, ClipboardList, RefreshCw, ArrowDown, Receipt, Wifi, WifiOff } from 'lucide-react';
 import { RepHome } from '@/components/rep/rep-home';
 import { ClientList } from '@/components/rep/client-list';
 import { InvoiceForm } from '@/components/rep/invoice-form';
@@ -125,7 +125,7 @@ function PullToRefresh({ onRefresh, children }: { onRefresh: () => void; childre
 }
 
 export function RepView() {
-  const { repTab, setRepTab, user, notifications, selectedClientId, setSelectedClientId } = useAppStore();
+  const { repTab, setRepTab, user, notifications, selectedClientId, setSelectedClientId, isOnline } = useAppStore();
   const [notifOpen, setNotifOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [animatingTab, setAnimatingTab] = useState<string | null>(null);
@@ -216,6 +216,21 @@ export function RepView() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Connectivity Indicator */}
+            <button
+              className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              title={isOnline ? 'متصل' : 'غير متصل'}
+            >
+              {isOnline ? (
+                <Wifi className="w-5 h-5 text-[#34C759]" />
+              ) : (
+                <WifiOff className="w-5 h-5 text-[#FF3B30]" />
+              )}
+              {!isOnline && (
+                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-[#FF3B30] rounded-full border-2 border-white dark:border-gray-900" />
+              )}
+            </button>
+
             {/* Pending Requests Badge in Header */}
             <button
               onClick={() => setRepTab('requests')}

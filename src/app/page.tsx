@@ -6,7 +6,6 @@ import { useAppStore } from '@/lib/store';
 import { LoginPage } from '@/components/app/login-page';
 import { RepView } from '@/components/app/rep-view';
 import { AdminView } from '@/components/app/admin-view';
-import { SyncIndicator } from '@/components/shared/sync-indicator';
 import { Droplets } from 'lucide-react';
 
 export default function Home() {
@@ -79,8 +78,6 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Sync Indicator - show only when logged in */}
-      {currentView !== 'login' && <SyncIndicator />}
     </>
   );
 }
