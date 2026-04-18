@@ -254,7 +254,7 @@ export function RepView() {
       <QuickFab />
 
       {/* Bottom Navigation - Modern Floating Style */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 px-3 pb-2 pt-1 pointer-events-none">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-3 pt-1 pointer-events-none">
         <div className="relative max-w-md mx-auto bg-white/90 dark:bg-[#1c1c1e]/90 backdrop-blur-2xl rounded-2xl shadow-[0_-2px_30px_rgba(0,0,0,0.08),0_0_0_0.5px_rgba(0,0,0,0.04)] dark:shadow-[0_-2px_30px_rgba(0,0,0,0.3),0_0_0_0.5px_rgba(255,255,255,0.05)] pointer-events-auto">
           {/* Subtle top highlight */}
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/60 dark:via-white/10 to-transparent rounded-t-2xl" />
