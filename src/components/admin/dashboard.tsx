@@ -336,9 +336,7 @@ export function Dashboard() {
   const statCards = stats
     ? [
         { label: 'إجمالي المناديب', value: stats.totalReps, icon: UserCircle, gradient: 'from-[#007AFF] to-[#5856D6]', shadow: 'shadow-[#007AFF]/25' },
-        { label: 'المناديب النشطون', value: stats.activeReps, icon: UserCheck, gradient: 'from-[#34C759] to-[#28A745]', shadow: 'shadow-[#34C759]/25' },
         { label: 'إجمالي العملاء', value: stats.totalClients, icon: Users, gradient: 'from-[#AF52DE] to-[#9B30D9]', shadow: 'shadow-[#AF52DE]/25' },
-        { label: 'إجمالي الفواتير', value: stats.totalInvoices, icon: FileText, gradient: 'from-[#FF9500] to-[#E68A00]', shadow: 'shadow-[#FF9500]/25' },
         { label: 'إجمالي الإيرادات', value: stats.totalRevenue, icon: DollarSign, gradient: 'from-[#FF6B6B] to-[#EE5A24]', shadow: 'shadow-[#FF6B6B]/25', format: true },
         { label: 'الطلبات المعلقة', value: stats.pendingRequests, icon: ClipboardList, gradient: 'from-[#FF3B30] to-[#D70015]', shadow: 'shadow-[#FF3B30]/25', clickable: true },
       ]
@@ -459,9 +457,9 @@ export function Dashboard() {
       </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         {loading
-          ? Array.from({ length: 6 }).map((_, i) => (
+          ? Array.from({ length: 4 }).map((_, i) => (
               <Skeleton key={i} className="h-[88px] rounded-xl" />
             ))
           : statCards.map((card, index) => {
