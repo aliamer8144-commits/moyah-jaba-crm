@@ -493,9 +493,9 @@ export function Dashboard() {
                   <p className="text-xl font-bold font-mono leading-none" style={{ color: card.color }}>
                     <AnimatedNumber value={card.value || 0} />
                   </p>
-                  <p className="text-[10px] text-gray-500 mt-1 font-medium">{card.label}</p>
+                  <p className="text-[10px] text-gray-600 mt-1 font-bold">{card.label}</p>
                   {card.format && (
-                    <p className="text-[9px] text-gray-400 mt-0.5"><SarIcon size={9} /></p>
+                    <p className="text-[9px] text-gray-500 mt-0.5 font-bold"><SarIcon size={9} /></p>
                   )}
                 </div>
               </motion.div>
