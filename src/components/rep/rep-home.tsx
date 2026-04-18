@@ -390,7 +390,7 @@ export function RepHome() {
                   const isMorning = hour < 12;
                   return isMorning
                     ? <Sun className="w-4 h-4 text-[#FFD60A]" />
-                    : <Moon className="w-4 h-4 text-[#C7D2FE]" />;
+                    : <Moon className="w-4 h-4 text-[#FFD60A]" />;
                 })()}
                 <p className="text-sm opacity-80">{greeting()}،</p>
               </div>
