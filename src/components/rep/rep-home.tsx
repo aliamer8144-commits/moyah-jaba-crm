@@ -387,7 +387,7 @@ export function RepHome() {
               <div className="flex items-center gap-2">
                 {(() => {
                   const hour = new Date().getHours();
-                  const isMorning = hour >= 5 && hour < 18;
+                  const isMorning = hour < 12;
                   return isMorning
                     ? <Sun className="w-4 h-4 text-[#FFD60A]" />
                     : <Moon className="w-4 h-4 text-[#C7D2FE]" />;
