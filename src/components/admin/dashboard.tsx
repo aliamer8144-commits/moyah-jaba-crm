@@ -335,10 +335,10 @@ export function Dashboard() {
 
   const statCards = stats
     ? [
-        { label: 'إجمالي المناديب', value: stats.totalReps, icon: UserCircle, gradient: 'from-[#007AFF] to-[#5856D6]', shadow: 'shadow-[#007AFF]/25' },
-        { label: 'إجمالي العملاء', value: stats.totalClients, icon: Users, gradient: 'from-[#AF52DE] to-[#9B30D9]', shadow: 'shadow-[#AF52DE]/25' },
-        { label: 'إجمالي الإيرادات', value: stats.totalRevenue, icon: DollarSign, gradient: 'from-[#FF6B6B] to-[#EE5A24]', shadow: 'shadow-[#FF6B6B]/25', format: true },
-        { label: 'الطلبات المعلقة', value: stats.pendingRequests, icon: ClipboardList, gradient: 'from-[#FF3B30] to-[#D70015]', shadow: 'shadow-[#FF3B30]/25', clickable: true },
+        { label: 'إجمالي المناديب', value: stats.totalReps, icon: UserCircle, color: '#007AFF', circleColor: '#5856D6' },
+        { label: 'إجمالي العملاء', value: stats.totalClients, icon: Users, color: '#AF52DE', circleColor: '#9B30D9' },
+        { label: 'إجمالي الإيرادات', value: stats.totalRevenue, icon: DollarSign, color: '#FF6B6B', circleColor: '#EE5A24', format: true },
+        { label: 'الطلبات المعلقة', value: stats.pendingRequests, icon: ClipboardList, color: '#FF3B30', circleColor: '#D70015', clickable: true },
       ]
     : [];
 
@@ -472,29 +472,30 @@ export function Dashboard() {
                 transition={{ delay: index * 0.08 + 0.1, duration: 0.4, ease: 'easeOut' }}
                 whileTap={{ scale: 0.97 }}
                 onClick={card.clickable ? () => setAdminTab('requests') : undefined}
-                className={`relative rounded-xl p-3 overflow-hidden bg-gradient-to-br ${card.gradient} text-white shadow-lg ${card.shadow} ${
+                className={`relative rounded-xl p-3 overflow-hidden shadow-sm border border-gray-100/50 ${
                   card.clickable ? 'cursor-pointer' : ''
                 }`}
+                style={{ backgroundColor: '#FAFAFA' }}
               >
                 {/* Decorative circles */}
-                <div className="absolute -top-4 -left-4 w-16 h-16 rounded-full bg-white/10" />
-                <div className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-white/5" />
+                <div className="absolute -top-4 -left-4 w-16 h-16 rounded-full" style={{ backgroundColor: `${card.circleColor}10` }} />
+                <div className="absolute bottom-2 right-2 w-8 h-8 rounded-full" style={{ backgroundColor: `${card.circleColor}08` }} />
 
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-2">
-                    <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
-                      <Icon className="w-4.5 h-4.5" />
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: `${card.color}15` }}>
+                      <Icon className="w-4.5 h-4.5" style={{ color: card.color }} />
                     </div>
                     {card.clickable && (
-                      <ArrowLeft className="w-3.5 h-3.5 text-white/60" />
+                      <ArrowLeft className="w-3.5 h-3.5 text-gray-400" />
                     )}
                   </div>
-                  <p className="text-xl font-bold font-mono leading-none text-white">
+                  <p className="text-xl font-bold font-mono leading-none" style={{ color: card.color }}>
                     <AnimatedNumber value={card.value || 0} />
                   </p>
-                  <p className="text-[10px] text-white mt-1 font-medium">{card.label}</p>
+                  <p className="text-[10px] text-gray-500 mt-1 font-medium">{card.label}</p>
                   {card.format && (
-                    <p className="text-[9px] text-white/50 mt-0.5"><SarIcon size={9} /></p>
+                    <p className="text-[9px] text-gray-400 mt-0.5"><SarIcon size={9} /></p>
                   )}
                 </div>
               </motion.div>
