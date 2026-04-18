@@ -335,12 +335,12 @@ export function Dashboard() {
 
   const statCards = stats
     ? [
-        { label: 'إجمالي المناديب', value: stats.totalReps, icon: UserCircle, color: '#007AFF', gradient: 'from-[#007AFF]/10 to-[#5856D6]/5' },
-        { label: 'المناديب النشطون', value: stats.activeReps, icon: UserCheck, color: '#34C759', gradient: 'from-[#34C759]/10 to-[#30D158]/5' },
-        { label: 'إجمالي العملاء', value: stats.totalClients, icon: Users, color: '#AF52DE', gradient: 'from-[#AF52DE]/10 to-[#BF5AF2]/5' },
-        { label: 'إجمالي الفواتير', value: stats.totalInvoices, icon: FileText, color: '#FF9500', gradient: 'from-[#FF9500]/10 to-[#FF9F0A]/5' },
-        { label: 'إجمالي الإيرادات', value: stats.totalRevenue, icon: DollarSign, color: '#34C759', format: true, gradient: 'from-[#34C759]/10 to-[#30D158]/5' },
-        { label: 'الطلبات المعلقة', value: stats.pendingRequests, icon: ClipboardList, color: '#FF3B30', clickable: true, gradient: 'from-[#FF3B30]/10 to-[#FF453A]/5' },
+        { label: 'إجمالي المناديب', value: stats.totalReps, icon: UserCircle, gradient: 'from-[#007AFF] to-[#5856D6]', shadow: 'shadow-[#007AFF]/25' },
+        { label: 'المناديب النشطون', value: stats.activeReps, icon: UserCheck, gradient: 'from-[#34C759] to-[#28A745]', shadow: 'shadow-[#34C759]/25' },
+        { label: 'إجمالي العملاء', value: stats.totalClients, icon: Users, gradient: 'from-[#AF52DE] to-[#9B30D9]', shadow: 'shadow-[#AF52DE]/25' },
+        { label: 'إجمالي الفواتير', value: stats.totalInvoices, icon: FileText, gradient: 'from-[#FF9500] to-[#E68A00]', shadow: 'shadow-[#FF9500]/25' },
+        { label: 'إجمالي الإيرادات', value: stats.totalRevenue, icon: DollarSign, gradient: 'from-[#FF6B6B] to-[#EE5A24]', shadow: 'shadow-[#FF6B6B]/25', format: true },
+        { label: 'الطلبات المعلقة', value: stats.pendingRequests, icon: ClipboardList, gradient: 'from-[#FF3B30] to-[#D70015]', shadow: 'shadow-[#FF3B30]/25', clickable: true },
       ]
     : [];
 
@@ -462,39 +462,46 @@ export function Dashboard() {
       <div className="grid grid-cols-3 gap-3">
         {loading
           ? Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-[88px] rounded-2xl" />
+              <Skeleton key={i} className="h-[88px] rounded-xl" />
             ))
-          : statCards.map((card) => (
+          : statCards.map((card, index) => {
+              const Icon = card.icon;
+              return (
               <motion.div
                 key={card.label}
-                variants={fadeUp}
+                initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: index * 0.08 + 0.1, duration: 0.4, ease: 'easeOut' }}
+                whileTap={{ scale: 0.97 }}
                 onClick={card.clickable ? () => setAdminTab('requests') : undefined}
-                whileTap={card.clickable ? { scale: 0.97 } : undefined}
-                className={`rounded-2xl p-4 shadow-sm transition-all duration-300 ${
-                  card.clickable ? 'cursor-pointer hover:shadow-md hover:-translate-y-0.5' : 'hover:shadow-md'
+                className={`relative rounded-xl p-3 overflow-hidden bg-gradient-to-br ${card.gradient} text-white shadow-lg ${card.shadow} ${
+                  card.clickable ? 'cursor-pointer' : ''
                 }`}
-                style={{
-                  background: `linear-gradient(to bottom right, ${card.color}0D, white)`,
-                  borderColor: `${card.color}1A`,
-                  borderWidth: '1px',
-                  borderStyle: 'solid',
-                }}
               >
-                <div className="flex items-center gap-2 mb-2">
-                  <card.icon className="w-4 h-4" style={{ color: card.color }} />
-                  <span className="text-[11px] text-gray-500 leading-tight">{card.label}</span>
-                  {card.clickable && (
-                    <ArrowLeft className="w-3 h-3 text-gray-400 mr-auto" />
+                {/* Decorative circles */}
+                <div className="absolute -top-4 -left-4 w-16 h-16 rounded-full bg-white/10" />
+                <div className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-white/5" />
+
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                      <Icon className="w-4.5 h-4.5" />
+                    </div>
+                    {card.clickable && (
+                      <ArrowLeft className="w-3.5 h-3.5 text-white/60" />
+                    )}
+                  </div>
+                  <p className="text-xl font-bold font-mono leading-none">
+                    <AnimatedNumber value={card.value || 0} />
+                  </p>
+                  <p className="text-[10px] text-white/70 mt-1 font-medium">{card.label}</p>
+                  {card.format && (
+                    <p className="text-[9px] text-white/50 mt-0.5"><SarIcon size={9} /></p>
                   )}
                 </div>
-                <p className="text-xl font-bold" style={{ color: card.color }}>
-                  <AnimatedNumber value={card.value || 0} />
-                </p>
-                {card.format && (
-                  <p className="text-[10px] text-gray-400 mt-0.5"><SarIcon size={10} /></p>
-                )}
               </motion.div>
-            ))}
+              );
+            })}
       </div>
 
       {/* Quick Actions Panel */}
