@@ -459,10 +459,10 @@ export function Dashboard() {
       </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+      <div className="grid grid-cols-3 gap-3">
         {loading
           ? Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-28 rounded-2xl" />
+              <Skeleton key={i} className="h-[88px] rounded-2xl" />
             ))
           : statCards.map((card) => (
               <motion.div
@@ -470,33 +470,29 @@ export function Dashboard() {
                 variants={fadeUp}
                 onClick={card.clickable ? () => setAdminTab('requests') : undefined}
                 whileTap={card.clickable ? { scale: 0.97 } : undefined}
-                className={`bg-gradient-to-br ${card.gradient} rounded-2xl p-4 shadow-sm border border-gray-100/50 dark:border-gray-700/30 transition-all duration-300 animate-card-gradient ${
+                className={`rounded-2xl p-4 shadow-sm transition-all duration-300 ${
                   card.clickable ? 'cursor-pointer hover:shadow-md hover:-translate-y-0.5' : 'hover:shadow-md'
                 }`}
+                style={{
+                  background: `linear-gradient(to bottom right, ${card.color}0D, white)`,
+                  borderColor: `${card.color}1A`,
+                  borderWidth: '1px',
+                  borderStyle: 'solid',
+                }}
               >
-                <div className="flex items-center justify-between mb-3">
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center animate-gradient-bg"
-                    style={{ backgroundColor: `${card.color}15` }}
-                  >
-                    <card.icon className="w-5 h-5" style={{ color: card.color }} />
-                  </div>
+                <div className="flex items-center gap-2 mb-2">
+                  <card.icon className="w-4 h-4" style={{ color: card.color }} />
+                  <span className="text-[11px] text-gray-500 leading-tight">{card.label}</span>
                   {card.clickable && (
-                    <ArrowLeft className="w-4 h-4 text-gray-400" />
+                    <ArrowLeft className="w-3 h-3 text-gray-400 mr-auto" />
                   )}
                 </div>
-                <p className="text-2xl font-bold text-[#1c1c1e] dark:text-white">
-                  {!loading ? (
-                    card.format ? (
-                      <AnimatedNumber value={card.value || 0} />
-                    ) : (
-                      <AnimatedNumber value={card.value} />
-                    )
-                  ) : (
-                    '...'
-                  )}
+                <p className="text-xl font-bold" style={{ color: card.color }}>
+                  <AnimatedNumber value={card.value || 0} />
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{card.label}</p>
+                {card.format && (
+                  <p className="text-[10px] text-gray-400 mt-0.5"><SarIcon size={10} /></p>
+                )}
               </motion.div>
             ))}
       </div>
