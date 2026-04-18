@@ -253,11 +253,13 @@ export function RepView() {
       {/* Quick FAB */}
       <QuickFab />
 
-      {/* Bottom Navigation - Modern Floating Style */}
+      {/* Bottom Navigation - Modern Floating Gradient Style */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 px-5 pb-5 pt-1 pointer-events-none">
-        <div className="relative max-w-md mx-auto bg-white/90 dark:bg-[#1c1c1e]/90 backdrop-blur-2xl rounded-2xl shadow-[0_-2px_30px_rgba(0,0,0,0.08),0_0_0_0.5px_rgba(0,0,0,0.04)] dark:shadow-[0_-2px_30px_rgba(0,0,0,0.3),0_0_0_0.5px_rgba(255,255,255,0.05)] pointer-events-auto">
-          {/* Subtle top highlight */}
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/60 dark:via-white/10 to-transparent rounded-t-2xl" />
+        <div className="relative max-w-md mx-auto rounded-2xl shadow-[0_-2px_30px_rgba(0,122,255,0.15),0_0_0_0.5px_rgba(88,86,214,0.1)] dark:shadow-[0_-2px_30px_rgba(0,0,0,0.4),0_0_0_0.5px_rgba(255,255,255,0.05)] overflow-hidden pointer-events-auto">
+          {/* Gradient Background */}
+          <div className="absolute inset-0 gradient-mesh-blue" />
+          {/* Subtle mesh overlay */}
+          <div className="absolute inset-0 bg-white/5" />
 
           <div className="relative flex items-center justify-around h-14 px-1">
             {tabs.map((tab) => {
@@ -270,14 +272,14 @@ export function RepView() {
                   whileTap={{ scale: 0.85 }}
                   onClick={() => handleTabChange(tab.id)}
                   className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all duration-300 relative min-w-[56px] ${
-                    isActive ? 'text-[#007AFF]' : 'text-gray-400 dark:text-gray-500'
+                    isActive ? 'text-white' : 'text-white/60'
                   } ${isAnimating ? 'animate-tab-press' : ''}`}
                 >
                   {/* Active background pill */}
                   {isActive && (
                     <motion.div
                       layoutId="activeTabBg"
-                      className="absolute inset-1 bg-[#007AFF]/8 dark:bg-[#007AFF]/10 rounded-xl"
+                      className="absolute inset-1 bg-white/20 rounded-xl"
                       transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                     />
                   )}
