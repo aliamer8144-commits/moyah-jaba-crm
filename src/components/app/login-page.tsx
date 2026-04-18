@@ -245,10 +245,10 @@ export function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden login-bg-particles dark:bg-gray-950">
       {/* Background gradient layers */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#007AFF]/8 via-transparent to-[#007AFF]/5 dark:from-[#007AFF]/5 dark:to-[#007AFF]/3" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#007AFF]/5 dark:bg-[#007AFF]/8 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-[#5856D6]/3 dark:bg-[#5856D6]/5 rounded-full blur-3xl" />
-      <div className="absolute top-1/4 right-0 w-[300px] h-[300px] bg-[#AF52DE]/3 dark:bg-[#AF52DE]/5 rounded-full blur-3xl" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#007AFF]/8 via-transparent to-[#007AFF]/5 dark:from-[#007AFF]/5 dark:to-[#007AFF]/3 pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-[#007AFF]/5 dark:bg-[#007AFF]/8 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-[#5856D6]/3 dark:bg-[#5856D6]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 right-0 w-[300px] h-[300px] bg-[#AF52DE]/3 dark:bg-[#AF52DE]/5 rounded-full blur-3xl pointer-events-none" />
       <div className="login-particles-inner" />
 
       {/* Water wave background */}
@@ -260,7 +260,7 @@ export function LoginPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="w-full max-w-sm"
+        className="w-full max-w-sm relative z-10"
       >
         {/* Card */}
         <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-xl shadow-black/5 border border-gray-200/50 dark:border-gray-800/50">
