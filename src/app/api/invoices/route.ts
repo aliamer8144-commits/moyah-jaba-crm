@@ -76,6 +76,7 @@ export async function POST(request: NextRequest) {
       paidAmount,
       debtAmount,
       creditAmount,
+      createdByAdmin,
     } = body;
 
     if (!repId || !clientId || !quantity || !price) {
@@ -163,6 +164,18 @@ export async function POST(request: NextRequest) {
           title: "فاتورة جديدة",
           message: `تم إنشاء فاتورة بمبلغ ${finalTotal} ر.س للعميل ${client?.name || "غير معروف"}`,
           type: "success",
+        },
+      }));
+    }
+
+    // If created by admin, notify the rep
+    if (createdByAdmin) {
+      await withRetry(() => db.notification.create({
+        data: {
+          userId: repId,
+          title: "فاتورة من المدير",
+          message: `تم إنشاء فاتورة بمبلغ ${finalTotal} ر.س للعميل ${client?.name || "غير معروف"} من قبل المدير`,
+          type: "info",
         },
       }));
     }

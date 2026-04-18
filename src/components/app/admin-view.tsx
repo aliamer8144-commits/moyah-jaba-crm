@@ -37,6 +37,7 @@ import { AdminNotifications } from '@/components/admin/admin-notifications';
 import { AdminSettings } from '@/components/admin/admin-settings';
 import { AdminReports } from '@/components/admin/admin-reports';
 import { AdminProducts } from '@/components/admin/admin-products';
+import { AdminQuickFab } from '@/components/admin/admin-quick-fab';
 import { NotificationsPanel } from '@/components/shared/notifications-panel';
 
 const navItems = [
@@ -317,6 +318,9 @@ export function AdminView() {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Admin FAB */}
+      <AdminQuickFab />
 
       {/* Notifications */}
       <NotificationsPanel open={notifOpen} onOpenChange={setNotifOpen} />

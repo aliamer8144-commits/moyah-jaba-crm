@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { repId, name, businessName, phone, address, category, notes } = body;
+    const { repId, name, businessName, phone, address, category, notes, createdByAdmin } = body;
 
     if (!repId || !name) {
       return NextResponse.json({ error: "اسم العميل مطلوب" }, { status: 400 });
@@ -89,6 +89,18 @@ export async function POST(request: NextRequest) {
           userId: admin.id,
           title: "عميل جديد",
           message: `تم إنشاء عميل "${name}" بواسطة المندوب`,
+          type: "info",
+        },
+      }));
+    }
+
+    // If created by admin, notify the rep
+    if (createdByAdmin) {
+      await withRetry(() => db.notification.create({
+        data: {
+          userId: repId,
+          title: "عميل جديد من المدير",
+          message: `تم إنشاء عميل "${name}" من قبل المدير وإضافته لحسابك`,
           type: "info",
         },
       }));
