@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
-import { Droplets, Home, Users, Plus, FileText, UserCircle, Bell, ClipboardList, RefreshCw, ArrowDown, Receipt } from 'lucide-react';
+import { Droplets, Home, Users, FileText, UserCircle, Bell, ClipboardList, RefreshCw, ArrowDown, Receipt } from 'lucide-react';
 import { RepHome } from '@/components/rep/rep-home';
 import { ClientList } from '@/components/rep/client-list';
 import { InvoiceForm } from '@/components/rep/invoice-form';
@@ -18,11 +18,9 @@ import { QuickFab } from '@/components/rep/quick-fab';
 
 const tabs = [
   { id: 'home' as const, label: 'الرئيسية', icon: Home },
-  { id: 'clients' as const, label: 'العملاء', icon: Users },
-  { id: 'create-invoice' as const, label: 'فاتورة', icon: Plus, isCenter: true },
   { id: 'invoices' as const, label: 'الفواتير', icon: FileText },
+  { id: 'clients' as const, label: 'العملاء', icon: Users },
   { id: 'expenses' as const, label: 'المصروفات', icon: Receipt },
-  { id: 'requests' as const, label: 'طلباتي', icon: ClipboardList },
   { id: 'profile' as const, label: 'حسابي', icon: UserCircle },
 ];
 
@@ -262,30 +260,6 @@ export function RepView() {
 
         <div className="relative flex items-center justify-around h-16 max-w-lg mx-auto px-1">
           {tabs.map((tab) => {
-            if (tab.isCenter) {
-              return (
-                <motion.button
-                  key={tab.id}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => handleTabChange(tab.id)}
-                  className={`flex flex-col items-center justify-center -mt-4 ${
-                    repTab === tab.id ? 'text-white' : 'text-gray-500'
-                  }`}
-                >
-                  <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-                      repTab === tab.id
-                        ? 'bg-gradient-to-br from-[#007AFF] to-[#5856D6] animate-fab-glow'
-                        : 'bg-[#007AFF] shadow-[#007AFF]/20 shadow-lg'
-                    }`}
-                  >
-                    <Plus className="w-6 h-6" />
-                  </div>
-                  <span className="text-[10px] mt-1 font-medium">فاتورة</span>
-                </motion.button>
-              );
-            }
-
             const isActive = repTab === tab.id;
             const isAnimating = animatingTab === tab.id;
             const Icon = tab.icon;
