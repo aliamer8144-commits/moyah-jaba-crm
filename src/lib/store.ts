@@ -118,17 +118,6 @@ export interface CallLogItem {
   client?: Client;
 }
 
-export interface DailyGoal {
-  id: string;
-  repId: string;
-  targetRevenue: number;
-  targetClients: number;
-  actualRevenue: number;
-  actualClients: number;
-  date: string;
-  createdAt: string;
-}
-
 interface AppState {
   // Invoice duplication
   duplicateInvoiceData: InvoiceDraft | null;

@@ -3,9 +3,8 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useAppStore, Client, Invoice } from '@/lib/store';
-import { Users, FileText, Package, AlertCircle, Clock, Sparkles, TrendingUp, Target, DollarSign, Trophy, Wallet } from 'lucide-react';
+import { Users, FileText, Package, AlertCircle, Clock, Sparkles, TrendingUp, Trophy, Wallet } from 'lucide-react';
 import { SarIcon } from '@/components/shared/sar-icon';
-import { DailyGoals } from '@/components/rep/daily-goals';
 import { AchievementBadges } from '@/components/rep/achievement-badges';
 import { WeeklySummary } from '@/components/rep/weekly-summary';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -269,139 +268,6 @@ function TodaysQuickStats() {
   );
 }
 
-function DailyGoalsSection() {
-  const { user } = useAppStore();
-  const [goalData, setGoalData] = useState<any>(null);
-  const [actualRevenue, setActualRevenue] = useState(0);
-  const [actualClients, setActualClients] = useState(0);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!user) return;
-    fetch(`/api/daily-goals?repId=${user.id}`)
-      .then((res) => res.ok ? res.json() : null)
-      .then((data) => {
-        if (data) {
-          setGoalData(data.goal);
-          setActualRevenue(data.actualRevenue);
-          setActualClients(data.actualClients);
-        }
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [user]);
-
-  const tRevenue = goalData?.targetRevenue || 0;
-  const tClients = goalData?.targetClients || 0;
-  const aRevenue = goalData?.actualRevenue ?? actualRevenue;
-  const aClients = goalData?.actualClients ?? actualClients;
-
-  const revenuePct = tRevenue > 0 ? Math.min(Math.round((aRevenue / tRevenue) * 100), 100) : 0;
-  const clientsPct = tClients > 0 ? Math.min(Math.round((aClients / tClients) * 100), 100) : 0;
-
-  let overallPct = 0;
-  if (tRevenue > 0 || tClients > 0) {
-    const pR = tRevenue > 0 ? Math.min(aRevenue / tRevenue, 1) : 1;
-    const pC = tClients > 0 ? Math.min(aClients / tClients, 1) : 1;
-    overallPct = Math.round(((pR + pC) / 2) * 100);
-  }
-
-  if (loading) {
-    return (
-      <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm">
-        <div className="h-24 bg-gray-100 dark:bg-gray-800 rounded-xl shimmer-skeleton" />
-      </div>
-    );
-  }
-
-  if (!goalData) {
-    return (
-      <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm border border-gray-100/50 dark:border-gray-800">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#007AFF]/10 to-[#5856D6]/10 flex items-center justify-center">
-            <Target className="w-5 h-5 text-[#007AFF]" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-bold text-[#1c1c1e] dark:text-white">أهداف اليوم</p>
-            <p className="text-xs text-gray-400">حدد أهدافك لمتابعة تقدمك</p>
-          </div>
-          <DailyGoals />
-        </div>
-      </div>
-    );
-  }
-
-  const getMotivationalMsg = (pct: number) => {
-    if (pct >= 100) return '🎯 مذهل! حققت أهدافك!';
-    if (pct >= 75) return 'اقتربت من الهدف!';
-    if (pct >= 50) return 'أداء رائع!';
-    if (pct >= 25) return 'أنت في الطريق الصحيح!';
-    return 'ابدأ يومك بقوة!';
-  };
-
-  return (
-    <div className="bg-white dark:bg-[#1c1c1e] rounded-2xl p-4 shadow-sm border border-gray-100/50 dark:border-gray-800">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Target className="w-4 h-4 text-[#007AFF]" />
-          <h3 className="text-sm font-bold text-[#1c1c1e] dark:text-white">أهداف اليوم</h3>
-          <span className={`text-xs font-bold px-2 py-0.5 rounded-full badge-gradient-green ${
-            overallPct >= 100 ? 'badge-gradient-green' :
-            overallPct >= 50 ? 'badge-gradient-blue' :
-            'badge-gradient-orange'
-          }`}>
-            {overallPct}%
-          </span>
-        </div>
-      </div>
-      {/* Motivational Message */}
-      <p className="text-xs text-gray-500 mb-3">{getMotivationalMsg(overallPct)}</p>
-      <div className="space-y-2.5">
-        {/* Revenue */}
-        <div>
-          <div className="flex items-center justify-between text-xs mb-1">
-            <span className="text-gray-500 flex items-center gap-1">
-              <DollarSign className="w-3 h-3 text-[#34C759]" />
-              الإيرادات
-            </span>
-            <span className="font-medium text-[#1c1c1e] dark:text-white">
-              {aRevenue.toLocaleString('ar-SA')} / {tRevenue.toLocaleString('ar-SA')}
-            </span>
-          </div>
-          <div className="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${revenuePct}%` }}
-              transition={{ duration: 0.8, ease: 'easeOut' }}
-              className="h-full bg-gradient-to-l from-[#34C759] to-[#30D158] rounded-full"
-            />
-          </div>
-        </div>
-        {/* Clients */}
-        <div>
-          <div className="flex items-center justify-between text-xs mb-1">
-            <span className="text-gray-500 flex items-center gap-1">
-              <Users className="w-3 h-3 text-[#007AFF]" />
-              العملاء الجدد
-            </span>
-            <span className="font-medium text-[#1c1c1e] dark:text-white">
-              {aClients} / {tClients}
-            </span>
-          </div>
-          <div className="h-2 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${clientsPct}%` }}
-              transition={{ duration: 0.8, ease: 'easeOut', delay: 0.1 }}
-              className="h-full bg-gradient-to-l from-[#007AFF] to-[#5AC8FA] rounded-full"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export function RepHome() {
   const { user, clients, setClients, invoices, setInvoices, setRepTab } = useAppStore();
   const [loading, setLoading] = useState(true);
@@ -628,11 +494,6 @@ export function RepHome() {
             </div>
           </div>
         </motion.div>
-      </motion.div>
-
-      {/* Daily Goals Progress */}
-      <motion.div variants={fadeUp}>
-        <DailyGoalsSection />
       </motion.div>
 
       {/* My Achievements */}

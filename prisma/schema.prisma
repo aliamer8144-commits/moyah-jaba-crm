@@ -28,7 +28,6 @@ model User {
   notifications  Notification[]
   activityLogs   ActivityLog[]
   expenses       Expense[]
-  dailyGoals     DailyGoal[]
   callLogs       CallLog[]
 
   @@index([username])
@@ -168,22 +167,6 @@ model Expense {
   description String?  @db.Text
   date        DateTime @default(now())
   createdAt   DateTime @default(now())
-
-  rep User @relation(fields: [repId], references: [id], onDelete: Cascade)
-
-  @@index([repId])
-  @@index([date])
-}
-
-model DailyGoal {
-  id            String   @id @default(cuid())
-  repId         String
-  targetRevenue Float    @default(0)
-  targetClients Int      @default(0)
-  actualRevenue Float    @default(0)
-  actualClients Int      @default(0)
-  date          DateTime @default(now())
-  createdAt     DateTime @default(now())
 
   rep User @relation(fields: [repId], references: [id], onDelete: Cascade)
 

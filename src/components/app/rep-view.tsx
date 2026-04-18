@@ -257,16 +257,6 @@ export function RepView() {
 
       {/* Bottom Navigation with Enhanced Polish */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 safe-bottom">
-        {/* Daily Goal Progress Bar */}
-        <div className="h-[3px] bg-gray-100 dark:bg-gray-800">
-          <motion.div
-            className="h-full animate-progress-shimmer rounded-full"
-            initial={{ width: 0 }}
-            animate={{ width: '65%' }}
-            transition={{ duration: 1.5, ease: 'easeOut', delay: 0.5 }}
-          />
-        </div>
-
         {/* Backdrop blur + shadow */}
         <div className="absolute inset-0 top-[3px] bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-t border-gray-200/50 dark:border-gray-800/50 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.3)]" />
 

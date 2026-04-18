@@ -126,9 +126,6 @@ async function main() {
     { key: 'company_name', value: 'مياه جبأ' },
     { key: 'currency', value: 'ر.س' },
     { key: 'tax_rate', value: '15' },
-    { key: 'default_target_revenue', value: '5000' },
-    { key: 'default_target_clients', value: '10' },
-    { key: 'default_target_visits', value: '15' },
   ]
 
   for (const sData of settingsData) {
