@@ -491,10 +491,10 @@ export function Dashboard() {
                       <ArrowLeft className="w-3.5 h-3.5 text-white/60" />
                     )}
                   </div>
-                  <p className="text-xl font-bold font-mono leading-none">
+                  <p className="text-xl font-bold font-mono leading-none text-white">
                     <AnimatedNumber value={card.value || 0} />
                   </p>
-                  <p className="text-[10px] text-white/70 mt-1 font-medium">{card.label}</p>
+                  <p className="text-[10px] text-white mt-1 font-medium">{card.label}</p>
                   {card.format && (
                     <p className="text-[9px] text-white/50 mt-0.5"><SarIcon size={9} /></p>
                   )}
