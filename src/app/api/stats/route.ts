@@ -27,38 +27,38 @@ export async function GET(request: NextRequest) {
       startDate.setHours(0, 0, 0, 0);
     }
 
-    // Daily revenue data for chart
+    // Daily revenue data for chart (PostgreSQL syntax)
     const dailyInvoicesRaw = await db.$queryRaw<Array<{ date: string; total: unknown; count: unknown }>>(
       Prisma.sql`
-        SELECT DATE(createdAt) as date, SUM(finalTotal) as total, COUNT(*) as count
-        FROM Invoice
-        WHERE createdAt >= ${startDate}
-        GROUP BY DATE(createdAt)
+        SELECT DATE("createdAt") as date, SUM("finalTotal") as total, COUNT(*) as count
+        FROM "Invoice"
+        WHERE "createdAt" >= ${startDate}
+        GROUP BY DATE("createdAt")
         ORDER BY date ASC
       `
     );
     const dailyInvoices = dailyInvoicesRaw.map((d) => ({ date: d.date, total: Number(d.total), count: Number(d.count) }));
 
-    // Monthly revenue
+    // Monthly revenue (PostgreSQL: TO_CHAR instead of strftime)
     const monthlyRevenueRaw = await db.$queryRaw<Array<{ month: string; total: unknown }>>(
       Prisma.sql`
-        SELECT strftime('%Y-%m', createdAt) as month, SUM(finalTotal) as total
-        FROM Invoice
-        WHERE createdAt >= ${new Date(now.getTime() - 365 * 86400000)}
-        GROUP BY strftime('%Y-%m', createdAt)
+        SELECT TO_CHAR("createdAt", 'YYYY-MM') as month, SUM("finalTotal") as total
+        FROM "Invoice"
+        WHERE "createdAt" >= ${new Date(now.getTime() - 365 * 86400000)}
+        GROUP BY TO_CHAR("createdAt", 'YYYY-MM')
         ORDER BY month ASC
       `
     );
     const monthlyRevenue = monthlyRevenueRaw.map((d) => ({ month: d.month, total: Number(d.total) }));
 
-    // Top clients by revenue
+    // Top clients by revenue (PostgreSQL: quoted table/column names, proper GROUP BY)
     const topClientsRaw = await db.$queryRaw<Array<{ clientId: string; clientName: string; total: unknown; invoiceCount: unknown }>>(
       Prisma.sql`
-        SELECT c.id as clientId, c.name as clientName, SUM(i.finalTotal) as total, COUNT(*) as invoiceCount
-        FROM Invoice i
-        JOIN Client c ON i.clientId = c.id
-        WHERE i.createdAt >= ${startDate}
-        GROUP BY i.clientId
+        SELECT c.id as "clientId", c.name as "clientName", SUM(i."finalTotal") as total, COUNT(*) as "invoiceCount"
+        FROM "Invoice" i
+        JOIN "Client" c ON i."clientId" = c.id
+        WHERE i."createdAt" >= ${startDate}
+        GROUP BY c.id, c.name
         ORDER BY total DESC
         LIMIT 5
       `
@@ -96,12 +96,12 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    // Payment method distribution
+    // Payment method distribution (PostgreSQL: quoted table/column names)
     const paymentMethodsRaw = await db.$queryRaw<Array<{ method: string; count: unknown; total: unknown }>>(
       Prisma.sql`
         SELECT method, COUNT(*) as count, SUM(amount) as total
-        FROM Receipt
-        WHERE createdAt >= ${startDate}
+        FROM "Receipt"
+        WHERE "createdAt" >= ${startDate}
         GROUP BY method
       `
     );

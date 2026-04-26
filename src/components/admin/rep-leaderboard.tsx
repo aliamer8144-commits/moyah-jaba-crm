@@ -42,24 +42,39 @@ export function RepLeaderboard() {
     const fetchData = async () => {
       try {
         const [repsRes, invRes] = await Promise.all([
-          fetch(`/api/reps?adminId=${user.id}`),
+          fetch(`/api/auth?adminId=${user.id}`),
           fetch(`/api/invoices?adminId=${user.id}`),
         ]);
 
         let repsData: RepData[] = [];
-        if (repsRes.ok) repsData = await repsRes.json();
+        if (repsRes.ok) {
+          const repsJson = await repsRes.json();
+          // /api/auth returns array of reps with _count
+          repsData = (Array.isArray(repsJson) ? repsJson : []).map((r: any) => ({
+            id: r.id,
+            name: r.name,
+            isActive: r.isActive,
+            clientCount: r._count?.clients || 0,
+            invoiceCount: r._count?.invoices || 0,
+            totalRevenue: 0,
+            totalPaid: 0,
+            totalDebt: 0,
+          }));
+        }
 
         // Enrich reps with revenue from invoices
         if (invRes.ok) {
           const invoices = await invRes.json();
-          const repRevenueMap = new Map<string, { revenue: number; invoices: number }>();
+          const repRevenueMap = new Map<string, { revenue: number; invoices: number; paid: number; debt: number }>();
           for (const inv of invoices) {
             const existing = repRevenueMap.get(inv.repId);
             if (existing) {
               existing.revenue += inv.finalTotal;
               existing.invoices += 1;
+              existing.paid += inv.paidAmount || 0;
+              existing.debt += inv.debtAmount || 0;
             } else {
-              repRevenueMap.set(inv.repId, { revenue: inv.finalTotal, invoices: 1 });
+              repRevenueMap.set(inv.repId, { revenue: inv.finalTotal, invoices: 1, paid: inv.paidAmount || 0, debt: inv.debtAmount || 0 });
             }
           }
           repsData = repsData.map(r => {
@@ -67,6 +82,8 @@ export function RepLeaderboard() {
             return {
               ...r,
               totalRevenue: revData?.revenue || 0,
+              totalPaid: revData?.paid || 0,
+              totalDebt: revData?.debt || 0,
               invoiceCount: revData?.invoices || r.invoiceCount || 0,
             };
           });
